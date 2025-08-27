@@ -35,7 +35,9 @@ import GlobalHeader from '../components/GlobalHeader.vue'
 }
 
 #basicLayout .content {
-  padding: 20px;
+  padding: 40px;
+  margin-left: 30px;
+  margin-right: 30px;
   margin-bottom: 28px;
   overflow: initial;
   background: #fff;

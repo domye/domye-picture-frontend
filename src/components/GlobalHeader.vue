@@ -28,7 +28,20 @@
         <div class="user-login-status">
           <!-- 如果用户已登录，显示用户名；否则显示登录按钮 -->
           <div v-if="loginUserStore.loginUser.id">
-            {{ loginUserStore.loginUser.userName ?? '无名' }}
+            <a-dropdown>
+              <ASpace>
+                <img :src="loginUserStore.loginUser.userAvatar" alt="avatar" style="width: 40px" />
+                {{ loginUserStore.loginUser.userName ?? '无名' }}</ASpace
+              >
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item @click="doLogout">
+                    <LogoutOutlined />
+                    退出登录
+                  </a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
           </div>
           <div v-else>
             <a-button type="primary" href="/user/login">登录</a-button>
@@ -41,11 +54,12 @@
 
 <script lang="ts" setup>
 // 导入必要的模块和组件
-import { h, ref } from 'vue'
-import { HomeOutlined } from '@ant-design/icons-vue'
-import type { MenuProps } from 'ant-design-vue'
+import { computed, h, ref } from 'vue'
+import { HomeOutlined, LogoutOutlined } from '@ant-design/icons-vue'
+import { message, type MenuProps } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '../stores/useLoginUserStore'
+import { userLogoutUsingPost } from '@/api/userController'
 
 // 初始化用户登录状态 store
 const loginUserStore = useLoginUserStore()
@@ -65,13 +79,26 @@ const doMenuClick = ({ key }: { key: string }) => {
   })
 }
 
+// 退出登录事件处理函数
+const doLogout = async () => {
+  const res = await userLogoutUsingPost()
+  if (res.data.code === 0) {
+    loginUserStore.setLoginUser({
+      userName: '未登录',
+    })
+    message.success('退出登录成功')
+    await router.push('/user/login')
+  } else {
+    message.error('退出登录失败，' + res.data.message)
+  }
+}
 // 监听路由变化，更新当前选中菜单项
 router.afterEach((to) => {
   current.value = [to.path]
 })
 
 // 定义菜单项
-const items = ref<MenuProps['items']>([
+const originItems = [
   {
     key: '/',
     icon: () => h(HomeOutlined),
@@ -79,16 +106,26 @@ const items = ref<MenuProps['items']>([
     title: '主页',
   },
   {
-    key: '/about',
-    label: '关于',
-    title: '关于',
+    key: '/admin/userManage',
+    label: '用户管理',
+    title: '用户管理',
   },
-  {
-    key: 'others',
-    label: h('a', { href: 'https://www.codefather.cn', target: '_blank' }, '编程导航'),
-    title: '编程导航',
-  },
-])
+]
+
+const filterMenus = (menus = [] as MenuProps['items']) => {
+  return menus?.filter((menu) => {
+    if (menu.key.startsWith('/admin')) {
+      const loginUser = loginUserStore.loginUser
+      if (!loginUser || loginUser.userRole !== 'admin') {
+        return false
+      }
+    }
+    return true
+  })
+}
+
+// 展示在菜单的路由数组
+const items = computed<MenuProps['items']>(() => filterMenus(originItems))
 </script>
 
 <style scoped>
