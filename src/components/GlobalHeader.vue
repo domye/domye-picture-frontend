@@ -8,9 +8,9 @@
         <RouterLink to="/">
           <div class="title-bar">
             <!-- logo 图片 -->
-            <img class="logo" src="https://q1.qlogo.cn/g?b=qq&nk=1523610551&s=640" alt="logo" />
+            <img class="logo" src="https://cdn.domye.top/uploads/07/1752738903.ico" alt="logo" />
             <!-- 网站标题 -->
-            <div class="title">摄影云图库</div>
+            <div class="title">栖影</div>
           </div>
         </RouterLink>
       </a-col>
@@ -110,6 +110,16 @@ const originItems = [
     label: '用户管理',
     title: '用户管理',
   },
+  {
+    key: '/add_picture',
+    label: '创建图片',
+    title: '创建图片',
+  },
+  {
+    key: '/admin/pictureManage',
+    label: '图片管理',
+    title: '图片管理',
+  },
 ]
 
 const filterMenus = (menus = [] as MenuProps['items']) => {
@@ -139,11 +149,11 @@ const items = computed<MenuProps['items']>(() => filterMenus(originItems))
 .title {
   color: black;
   font-size: 18px;
-  margin-left: 16px;
+  margin-left: 8px;
 }
 
 /* logo 图片的样式 */
 .logo {
-  height: 48px;
+  height: 30px;
 }
 </style>

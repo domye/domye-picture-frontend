@@ -7,9 +7,7 @@
       </a-layout-content>
       <a-layout-footer>Footer</a-layout-footer>
     </a-layout>
-    <a-layout-footer class="footer">
-      <a href="https://www.codefather.cn" target="_blank"> 编程导航 by 程序员鱼皮 </a>
-    </a-layout-footer>
+    <a-layout-footer class="footer"> By Domye </a-layout-footer>
   </div>
 </template>
 
@@ -24,14 +22,17 @@ import GlobalHeader from '../components/GlobalHeader.vue'
   color: unset;
   background: white;
 }
+
 #basicLayout .footer {
-  background: #efefef;
-  padding: 16px;
+  background: #ffffff; /* 改变背景颜色 */
+  padding: 20px 16px; /* 增加内边距 */
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   text-align: center;
+  font-size: 14px; /* 字体大小 */
+  color: #666; /* 字体颜色 */
 }
 
 #basicLayout .content {
@@ -41,5 +42,11 @@ import GlobalHeader from '../components/GlobalHeader.vue'
   margin-bottom: 28px;
   overflow: initial;
   background: #fff;
+}
+
+/* 添加一些额外的样式，比如阴影和圆角 */
+#basicLayout .footer {
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+  border-radius: 10px 10px 0 0; /* 添加圆角 */
 }
 </style>
