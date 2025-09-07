@@ -6,19 +6,14 @@
       :pagination="pagination"
       @change="doTableChange"
     >
-      <template #headerCell="{ column }">
-        <template v-if="column.key === 'name'">
-          <span>
-            <smile-outlined />
-            Name
-          </span>
-        </template>
-      </template>
-
+      <!-- 自定义数据展示方式 -->
       <template #bodyCell="{ column, record }">
+        <!-- 用户头像展示 -->
         <template v-if="column.dataIndex === 'userAvatar'">
           <a-image :src="record.userAvatar" :width="50" />
         </template>
+
+        <!-- 用户身份展示 -->
         <template v-else-if="column.dataIndex === 'userRole'">
           <div v-if="record.userRole === 'admin'">
             <a-tag color="green">管理员</a-tag>
@@ -27,10 +22,13 @@
             <a-tag color="blue">普通用户</a-tag>
           </div>
         </template>
+
+        <!-- 创建时间展示 -->
         <template v-else-if="column.dataIndex === 'createTime'">
           {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
 
+        <!-- 操作按钮 -->
         <template v-else-if="column.key === 'action'">
           <a-button danger @click="doDelete(record.id)">删除</a-button>
         </template>
@@ -43,6 +41,11 @@ import dayjs from 'dayjs'
 import { deleteUserUsingPost, listUserVoByPageUsingPost } from '@/api/userController'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref } from 'vue'
+// 数据
+const dataList = ref<API.UserVO[]>([])
+const total = ref(0)
+
+// 表格列
 const columns = [
   {
     title: '账号',
@@ -88,9 +91,6 @@ const doTableChange = (page: any) => {
   searchParams.pageSize = page.pageSize
   fetchData()
 }
-// 数据
-const dataList = ref<API.UserVO[]>([])
-const total = ref(0)
 
 // 搜索条件
 const searchParams = reactive<API.UserQueryRequest>({
@@ -109,6 +109,7 @@ const doDelete = async (id: number) => {
     message.error('删除失败，' + res.data.message)
   }
 }
+
 // 获取数据
 const fetchData = async () => {
   const res = await listUserVoByPageUsingPost({

@@ -33,6 +33,7 @@ import GlobalHeader from '../components/GlobalHeader.vue'
   text-align: center;
   font-size: 14px; /* 字体大小 */
   color: #666; /* 字体颜色 */
+  z-index: 1000; /* 确保在其他内容之上 */
 }
 
 #basicLayout .content {

@@ -27,13 +27,26 @@ interface Props {
   spaceId?: number
   onSuccess?: (newPicture: API.PictureVO) => void
 }
-
+//数据
+const loading = ref<boolean>(false)
 const props = defineProps<Props>()
 
-/**
- * 上传图片
- * @param file
- */
+// 校验图片
+const beforeUpload = (file: UploadProps['fileList'][number]) => {
+  // 校验图片格式
+  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
+  if (!isJpgOrPng) {
+    message.error('不支持上传该格式的图片，推荐 jpg 或 png')
+  }
+  // 校验图片大小
+  const isLt2M = file.size / 1024 / 1024 < 2
+  if (!isLt2M) {
+    message.error('不能上传超过 2M 的图片')
+  }
+  return isJpgOrPng && isLt2M
+}
+
+// 上传图片
 const handleUpload = async ({ file }: any) => {
   loading.value = true
   try {
@@ -52,26 +65,6 @@ const handleUpload = async ({ file }: any) => {
     message.error('图片上传失败，' + error.message)
   }
   loading.value = false
-}
-
-const loading = ref<boolean>(false)
-
-/**
- * 上传前的校验
- * @param file
- */
-const beforeUpload = (file: UploadProps['fileList'][number]) => {
-  // 校验图片格式
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
-  if (!isJpgOrPng) {
-    message.error('不支持上传该格式的图片，推荐 jpg 或 png')
-  }
-  // 校验图片大小
-  const isLt2M = file.size / 1024 / 1024 < 2
-  if (!isLt2M) {
-    message.error('不能上传超过 2M 的图片')
-  }
-  return isJpgOrPng && isLt2M
 }
 </script>
 <style scoped>

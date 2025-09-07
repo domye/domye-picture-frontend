@@ -1,13 +1,21 @@
 <template>
   <div id="addPicturePage">
+    <!-- 标题 -->
     <h2 style="margin-bottom: 16px">
       {{ route.query?.id ? '修改图片' : '创建图片' }}
     </h2>
+
+    <!-- 上传图片 -->
     <PictureUpload :picture="picture" :onSuccess="onSuccess" />
+
+    <!-- 图片信息表单 -->
     <a-form v-if="picture" layout="vertical" :model="pictureForm" @finish="handleSubmit">
+      <!-- 名称 -->
       <a-form-item label="名称" name="name">
         <a-input v-model:value="pictureForm.name" placeholder="请输入名称" />
       </a-form-item>
+
+      <!-- 简介 -->
       <a-form-item label="简介" name="introduction">
         <a-textarea
           v-model:value="pictureForm.introduction"
@@ -17,6 +25,8 @@
           allowClear
         />
       </a-form-item>
+
+      <!-- 分类 -->
       <a-form-item label="分类" name="category">
         <a-auto-complete
           v-model:value="pictureForm.category"
@@ -25,6 +35,8 @@
           :options="categoryOptions"
         />
       </a-form-item>
+
+      <!-- 标签 -->
       <a-form-item label="标签" name="tags">
         <a-select
           v-model:value="pictureForm.tags"
@@ -34,6 +46,8 @@
           :options="tagOptions"
         />
       </a-form-item>
+
+      <!-- 提交按钮 -->
       <a-form-item>
         <a-button type="primary" html-type="submit" style="width: 100%">创建</a-button>
       </a-form-item>
@@ -53,12 +67,12 @@ import { message } from 'ant-design-vue'
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
+// 数据
 const picture = ref<API.PictureVO>()
 const pictureForm = reactive<API.PictureEditRequest>({})
-const onSuccess = (newPicture: API.PictureVO) => {
-  picture.value = newPicture
-  pictureForm.name = newPicture.name
-}
+const categoryOptions = ref<string[]>([])
+const tagOptions = ref<string[]>([])
+
 // 获取老数据
 const getOldPicture = async () => {
   // 获取数据
@@ -77,6 +91,8 @@ const getOldPicture = async () => {
     }
   }
 }
+
+//上传图片
 const handleSubmit = async (values: any) => {
   if (!picture.value.id) {
     // 图片未上传
@@ -99,8 +115,13 @@ const handleSubmit = async (values: any) => {
   }
 }
 
-const categoryOptions = ref<string[]>([])
-const tagOptions = ref<string[]>([])
+// 上传成功的回调
+const onSuccess = (newPicture: API.PictureVO) => {
+  picture.value = newPicture
+  pictureForm.name = newPicture.name
+}
+
+// 获取标签分类
 const getTagCategories = async () => {
   const res = await listPictureTagCategoryUsingGet()
   if (res.data.code === 0 && res.data.data) {
@@ -120,6 +141,8 @@ const getTagCategories = async () => {
     message.error('获取标签分类失败，' + res.data.message)
   }
 }
+
+// 页面加载时请求一次
 onMounted(() => {
   getTagCategories()
   getOldPicture()
