@@ -17,7 +17,6 @@
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import type { UploadProps } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
 import { uploadPictureUsingPost } from '@/api/pictureController.ts'
@@ -46,7 +45,10 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   return isJpgOrPng && isLt2M
 }
 
-// 上传图片
+/**
+ * 上传图片
+ * @param file
+ */
 const handleUpload = async ({ file }: any) => {
   loading.value = true
   try {

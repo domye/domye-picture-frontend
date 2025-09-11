@@ -72,7 +72,7 @@
           <!-- 图片展示 -->
           <template v-if="column.dataIndex === 'url'">
             <a-image
-              :src="record.thumbnailUrl || record.url"
+              :src="record.thumbnailUrl"
               :width="60"
               :preview="{
                 src: record.url,

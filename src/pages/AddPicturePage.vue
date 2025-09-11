@@ -4,9 +4,11 @@
     <h2 style="margin-bottom: 16px">
       {{ route.query?.id ? '修改图片' : '创建图片' }}
     </h2>
-
+    <a-typography-paragraph v-if="spaceId" type="secondary">
+      保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}</a>
+    </a-typography-paragraph>
     <!-- 上传图片 -->
-    <PictureUpload :picture="picture" :onSuccess="onSuccess" />
+    <PictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
 
     <!-- 图片信息表单 -->
     <a-form v-if="picture" layout="vertical" :model="pictureForm" @finish="handleSubmit">
@@ -64,7 +66,7 @@ import {
 import PictureUpload from '@/components/PictureUpload.vue'
 import router from '@/router'
 import { message } from 'ant-design-vue'
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 // 数据
@@ -72,7 +74,10 @@ const picture = ref<API.PictureVO>()
 const pictureForm = reactive<API.PictureEditRequest>({})
 const categoryOptions = ref<string[]>([])
 const tagOptions = ref<string[]>([])
-
+// 空间 id
+const spaceId = computed(() => {
+  return route.query?.spaceId
+})
 // 获取老数据
 const getOldPicture = async () => {
   // 获取数据
@@ -94,24 +99,25 @@ const getOldPicture = async () => {
 
 //上传图片
 const handleSubmit = async (values: any) => {
-  if (!picture.value.id) {
-    // 图片未上传
-    message.error('请先上传图片')
+  console.log(values)
+  const pictureId = picture.value.id
+  if (!pictureId) {
     return
   }
-  try {
-    const res = await editPictureUsingPost({
-      id: picture.value.id,
-      ...values,
+  const res = await editPictureUsingPost({
+    id: pictureId,
+    spaceId: spaceId.value,
+    ...values,
+  })
+  // 操作成功
+  if (res.data.code === 0 && res.data.data) {
+    message.success('创建成功')
+    // 跳转到图片详情页
+    router.push({
+      path: `/picture/${pictureId}`,
     })
-    if (res.data.code === 0 && res.data.data) {
-      message.success('图片创建成功')
-      router.push('/picture/' + picture.value.id)
-    } else {
-      message.error('图片创建失败，' + res.data.message)
-    }
-  } catch (error) {
-    console.error('图片创建失败', error)
+  } else {
+    message.error('创建失败，' + res.data.message)
   }
 }
 
