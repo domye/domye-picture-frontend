@@ -186,7 +186,6 @@
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref } from 'vue'
-import { PlusOutlined } from '@ant-design/icons-vue'
 import {
   deletePictureUsingPost,
   doPictureReviewUsingPost,
@@ -270,7 +269,7 @@ const columns = [
   {
     title: '操作',
     key: 'action',
-    width: 200,
+    width: 100,
     fixed: 'right',
   },
 ]

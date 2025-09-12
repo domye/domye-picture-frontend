@@ -67,7 +67,7 @@ const loginUserStore = useLoginUserStore()
 
 #basicLayout .sider {
   background: #fff;
-  padding-top: 20px;
+  /* padding-top: 20px; */
   /* border-right: 0.5px solid #eee; */
   margin-bottom: 28px;
 }

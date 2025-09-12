@@ -16,7 +16,7 @@
     </a-space>
   </a-flex>
   <!-- 图片列表 -->
-  <PictureList :dataList="dataList" :loading="loading" />
+  <PictureList :loading="loading" showOp :dataList="dataList" :onReload="fetchData" />
   <a-pagination
     style="text-align: right"
     v-model:current="searchParams.current"
@@ -38,7 +38,7 @@ const formatSize = (bytes) => {
   if (typeof bytes === 'number' && !isNaN(bytes)) {
     return filesize(bytes, { base: 2, standard: 'jedec', unit: 'MB' })
   } else {
-    return '无效的大小'
+    return ''
   }
 }
 

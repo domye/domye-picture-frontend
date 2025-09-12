@@ -1,6 +1,6 @@
 <template>
   <div id="globalSider">
-    <a-layout-sider class="sider" width="200">
+    <a-layout-sider class="sider" width="200px">
       <a-menu
         mode="inline"
         v-model:selectedKeys="current"
