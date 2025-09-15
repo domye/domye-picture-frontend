@@ -80,6 +80,19 @@
             <a-descriptions-item label="上传时间">
               {{ formatDate(picture.createTime) }}
             </a-descriptions-item>
+            <a-descriptions-item label="主色调">
+              <a-space>
+                {{ picture.picColor ?? '-' }}
+                <div
+                  v-if="picture.picColor"
+                  :style="{
+                    backgroundColor: toHexColor(picture.picColor),
+                    width: '16px',
+                    height: '16px',
+                  }"
+                />
+              </a-space>
+            </a-descriptions-item>
           </a-descriptions>
 
           <div class="action-buttons" v-if="!loading">
@@ -154,6 +167,16 @@ const imageMaxHeight = computed(() => {
   return window.innerHeight > 800 ? '600px' : '400px'
 })
 
+function toHexColor(input) {
+  // 去掉 0x 前缀
+  const colorValue = input.startsWith('0x') ? input.slice(2) : input
+
+  // 将剩余部分解析为十六进制数，再转成 6 位十六进制字符串
+  const hexColor = parseInt(colorValue, 16).toString(16).padStart(6, '0')
+
+  // 返回标准 #RRGGBB 格式
+  return `#${hexColor}`
+}
 // 获取图片详情
 const fetchPictureDetail = async () => {
   if (!props.id) return
