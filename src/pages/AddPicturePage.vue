@@ -16,7 +16,8 @@
         :imageUrl="picture?.url"
         :picture="picture"
         :spaceId="spaceId"
-        :onSuccess="onCropSuccess"
+        :space="space"
+        :onSuccess="onSuccess"
       />
     </div>
     <!-- 图片信息表单 -->
@@ -75,9 +76,10 @@ import {
 import PictureUpload from '@/components/PictureUpload.vue'
 import router from '@/router'
 import { message } from 'ant-design-vue'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import ImageCropper from '@/components/ImageCropper.vue'
+import { getSpaceVoByIdUsingGet } from '@/api/spaceController'
 const route = useRoute()
 // 数据
 const picture = ref<API.PictureVO>()
@@ -171,6 +173,24 @@ const getTagCategories = async () => {
     message.error('获取标签分类失败，' + res.data.message)
   }
 }
+const space = ref<API.SpaceVO>()
+
+// 获取空间信息
+const fetchSpace = async () => {
+  // 获取数据
+  if (spaceId.value) {
+    const res = await getSpaceVoByIdUsingGet({
+      id: spaceId.value,
+    })
+    if (res.data.code === 0 && res.data.data) {
+      space.value = res.data.data
+    }
+  }
+}
+
+watchEffect(() => {
+  fetchSpace()
+})
 
 // 页面加载时请求一次
 onMounted(() => {

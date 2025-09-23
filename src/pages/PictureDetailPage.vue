@@ -103,7 +103,7 @@
                   <EditOutlined />
                 </template>
               </a-button>
-              <a-button v-if="canEdit" danger @click="doDelete">
+              <a-button v-if="canDelete" danger @click="doDelete">
                 删除
                 <template #icon>
                   <DeleteOutlined />
@@ -120,25 +120,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { deletePictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController'
 import type { API } from '@/api/typings'
 import dayjs from 'dayjs'
-import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import router from '@/router'
-const loginUserStore = useLoginUserStore()
-// 是否具有编辑权限
-const canEdit = computed(() => {
-  const loginUser = loginUserStore.loginUser
-  // 未登录不可编辑
-  if (!loginUser.id) {
-    return false
-  }
-  // 仅本人或管理员可编辑
-  const user = picture.value.user || {}
-  return loginUser.id === user.id || loginUser.userRole === 'admin'
-}) // 编辑
+import { SPACE_PERMISSION_ENUM } from '@/constants/space'
+
 const doEdit = () => {
   router.push('/add_picture?id=' + picture.value.id)
 }
@@ -197,7 +186,16 @@ const fetchPictureDetail = async () => {
     loading.value = false
   }
 }
+// 通用权限检查函数
+function createPermissionChecker(permission: string) {
+  return computed(() => {
+    return (picture.value.permissionList ?? []).includes(permission)
+  })
+}
 
+// 定义权限检查
+const canEdit = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
+const canDelete = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
 // 格式化文件大小
 const formatFileSize = (bytes?: number): string => {
   if (!bytes) return '-'

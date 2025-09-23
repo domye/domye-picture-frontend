@@ -3,6 +3,12 @@
     <h2>空间管理</h2>
     <a-space>
       <a-button type="primary" href="/add_space" target="_blank">+ 创建空间</a-button>
+      <a-button type="primary" ghost href="/space_analyze?queryPublic=1" target="_blank">
+        分析公共图库
+      </a-button>
+      <a-button type="primary" ghost href="/space_analyze?queryAll=1" target="_blank">
+        分析全空间
+      </a-button>
     </a-space>
   </a-flex>
   <div class="picture-manage-container">
@@ -16,6 +22,16 @@
             allow-clear
           />
         </a-form-item>
+        <a-form-item label="空间类别" name="spaceType">
+          <a-select
+            v-model:value="searchParams.spaceType"
+            :options="SPACE_TYPE_OPTIONS"
+            placeholder="请输入空间类别"
+            style="min-width: 180px"
+            allow-clear
+          />
+        </a-form-item>
+
         <a-form-item label="空间级别" name="spaceLevel">
           <a-select
             v-model:value="searchParams.spaceLevel"
@@ -63,6 +79,10 @@
           <template v-if="column.dataIndex === 'spaceLevel'">
             <a-tag>{{ SPACE_LEVEL_MAP[record.spaceLevel] }}</a-tag>
           </template>
+          <!-- 空间类别 -->
+          <template v-if="column.dataIndex === 'spaceType'">
+            <a-tag>{{ SPACE_TYPE_MAP[record.spaceType] }}</a-tag>
+          </template>
           <!-- 使用情况 -->
           <template v-if="column.dataIndex === 'spaceUseInfo'">
             <div>大小：{{ formatSize(record.totalSize) }} / {{ formatSize(record.maxSize) }}</div>
@@ -80,7 +100,10 @@
 
           <!-- 操作按钮 -->
           <template v-else-if="column.key === 'action'">
-            <a-space wrap>
+            <a-space>
+              <a-button type="link" :href="`/space_analyze?spaceId=${record.id}`" target="_blank">
+                分析
+              </a-button>
               <a-button type="link" :href="`/add_space?id=${record.id}`" target="_blank">
                 编辑
               </a-button>
@@ -97,14 +120,13 @@
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref } from 'vue'
+import { formatSize } from '@/utils'
 import {
   deleteSpaceUsingPost,
   listSpaceByPageUsingPost,
   listSpaceLevelUsingGet,
 } from '@/api/spaceController'
-import { SPACE_LEVEL_MAP } from '@/constants/space'
-import { filesize } from 'filesize'
-const formatSize = (bytes) => filesize(bytes, { base: 2, standard: 'jedec', unit: 'MB' })
+import { SPACE_LEVEL_MAP, SPACE_TYPE_MAP } from '@/constants/space'
 // 数据
 const dataList = ref([])
 const total = ref(0)
@@ -120,6 +142,11 @@ const columns = [
   {
     title: '空间名称',
     dataIndex: 'spaceName',
+    width: 150,
+  },
+  {
+    title: '空间类别',
+    dataIndex: 'spaceType',
   },
   {
     title: '空间级别',
@@ -145,7 +172,6 @@ const columns = [
   {
     title: '操作',
     key: 'action',
-    width: 200,
     fixed: 'right',
   },
 ]
@@ -235,21 +261,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
-.page-header {
-  margin-bottom: 10px;
-
-  .page-title {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 500;
-    color: rgba(0, 0, 0, 0.85);
-  }
-
-  .create-btn {
-    margin-left: auto;
-  }
-}
-
 .picture-manage-container {
   // background-color: #f0f2f5;
   //  padding: 16px;
@@ -307,10 +318,6 @@ onMounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.action-btn {
-  padding: 0 4px;
 }
 
 @media (max-width: 768px) {

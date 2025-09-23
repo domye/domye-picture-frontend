@@ -2,8 +2,9 @@
   <div id="addPicturePage">
     <!-- 标题 -->
     <h2 style="margin-bottom: 16px">
-      {{ route.query?.id ? '修改图片' : '创建图片' }}
+      {{ route.query?.id ? '修改' : '创建' }}{{ SPACE_TYPE_MAP[spaceType] }}
     </h2>
+
     <a-form layout="vertical" :model="formData" @finish="handleSubmit">
       <a-form-item label="空间名称" name="spaceName">
         <a-input v-model:value="formData.spaceName" placeholder="请输入空间名称" allow-clear />
@@ -40,12 +41,18 @@ import {
   listSpaceLevelUsingGet,
   updateSpaceUsingPost,
 } from '@/api/spaceController'
-import { SPACE_LEVEL_ENUM } from '@/constants/space'
+import {
+  SPACE_LEVEL_ENUM,
+  SPACE_TYPE_ENUM,
+  SPACE_TYPE_MAP,
+  SPACE_TYPE_OPTIONS,
+} from '@/constants/space'
 import router from '@/router'
 import { message } from 'ant-design-vue'
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
+
 import { filesize } from 'filesize'
 const formatSize = (bytes) => filesize(bytes, { base: 2, standard: 'jedec', unit: 'MB' })
 // 数据
@@ -53,7 +60,13 @@ const formData = reactive<API.SpaceAddRequest | API.SpaceUpdateRequest>({
   spaceName: '',
   spaceLevel: SPACE_LEVEL_ENUM.COMMON,
 })
-
+// 空间类别
+const spaceType = computed(() => {
+  if (route.query?.type) {
+    return Number(route.query.type)
+  }
+  return SPACE_TYPE_ENUM.PRIVATE
+})
 const loading = ref(false)
 const SPACE_LEVEL_OPTIONS = ref<string[]>([])
 // 获取老数据
@@ -89,6 +102,7 @@ const handleSubmit = async (values: any) => {
     // 创建
     res = await addSpaceUsingPost({
       ...formData,
+      spaceType: spaceType.value,
     })
   }
   if (res.data.code === 0 && res.data.data) {

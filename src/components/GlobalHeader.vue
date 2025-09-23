@@ -31,18 +31,22 @@
             <a-dropdown>
               <ASpace>
                 <img :src="loginUserStore.loginUser.userAvatar" alt="avatar" style="width: 40px" />
-                {{ loginUserStore.loginUser.userName ?? '无名' }}</ASpace
-              >
+                {{ loginUserStore.loginUser.userName ?? '无名' }}
+                <!-- 显示用户名或'无名' -->
+              </ASpace>
               <template #overlay>
-                <a-menu
-                  ><a-menu-item>
+                <a-menu>
+                  <a-menu-item>
                     <router-link to="/my_space">
                       <UserOutlined />
+                      <!-- 用户图标 -->
                       我的空间
                     </router-link>
                   </a-menu-item>
                   <a-menu-item @click="doLogout">
+                    <!-- 退出登录菜单项 -->
                     <LogoutOutlined />
+                    <!-- 退出图标 -->
                     退出登录
                   </a-menu-item>
                 </a-menu>
@@ -51,6 +55,7 @@
           </div>
           <div v-else>
             <a-button type="primary" href="/user/login">登录</a-button>
+            <!-- 登录按钮 -->
           </div>
         </div>
       </a-col>
@@ -78,7 +83,7 @@ const router = useRouter()
 // 当前选中菜单项的 key
 const current = ref<string[]>([])
 
-// 菜单点击事件处理函数
+// 菜单项点击事件处理函数
 const doMenuClick = ({ key }: { key: string }) => {
   router.push({
     path: key,
@@ -98,6 +103,7 @@ const doLogout = async () => {
     message.error('退出登录失败，' + res.data.message)
   }
 }
+
 // 监听路由变化，更新当前选中菜单项
 router.afterEach((to) => {
   current.value = [to.path]
@@ -107,7 +113,7 @@ router.afterEach((to) => {
 const originItems = [
   {
     key: '/',
-    icon: () => h(HomeOutlined),
+    icon: () => h(HomeOutlined), // 主页图标
     label: '主页',
     title: '主页',
   },
@@ -133,6 +139,7 @@ const originItems = [
   },
 ]
 
+// 过滤菜单项，仅管理员可访问管理页面
 const filterMenus = (menus = [] as MenuProps['items']) => {
   return menus?.filter((menu) => {
     if (menu.key.startsWith('/admin')) {
