@@ -1,13 +1,15 @@
+Fitten Code
+为了实现这个需求，你可以通过CSS媒体查询来根据屏幕宽度调整标题和按钮的布局。在你的代码中，你可以添加一些CSS样式来实现这个功能。以下是修改后的代码示例：
+vue 复制 插入 展开
 <template>
   <PictureSearchForm :onSearch="onSearch" />
   <a-form-item label="按颜色搜索" style="margin-top: 16px">
     <color-picker format="hex" @pureColorChange="onColorChange" shape="circle" />
   </a-form-item>
   <!-- 空间信息 -->
-  <a-flex justify="space-between">
+  <div class="space-header">
     <h2>{{ space.spaceName }}（{{ SPACE_TYPE_MAP[space.spaceType] }}）</h2>
-
-    <a-space size="middle">
+    <a-space size="middle" class="space-buttons">
       <a-button
         v-if="canUploadPicture"
         type="primary"
@@ -16,7 +18,6 @@
       >
         + 创建图片
       </a-button>
-
       <a-button
         v-if="canManageSpaceUser"
         type="primary"
@@ -27,7 +28,6 @@
       >
         成员管理
       </a-button>
-
       <a-button
         v-if="canEditPicture"
         type="primary"
@@ -45,7 +45,7 @@
         />
       </a-tooltip>
     </a-space>
-  </a-flex>
+  </div>
   <!-- 图片列表 -->
   <PictureList
     :dataList="dataList"
@@ -64,7 +64,6 @@
     @change="onPageChange"
   />
 </template>
-
 <script lang="ts" setup>
 import { computed, h, watch } from 'vue'
 import {
@@ -115,7 +114,6 @@ const onColorChange = async (color: string) => {
     message.error('获取数据失败，' + res.data.message)
   }
 }
-onMounted(() => {})
 
 // 数据
 const dataList = ref([])
@@ -158,6 +156,8 @@ const onSearch = (newSearchParams: API.PictureQueryRequest) => {
   }
   fetchData()
 }
+
+// 监听空间id变化
 watch(
   () => props.id,
   (newSpaceId) => {
@@ -189,5 +189,29 @@ onMounted(() => {
   fetchSpaceDetail()
 })
 </script>
-
-<style></style>
+<style>
+.space-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.space-header h2,
+.space-space {
+  flex: 1;
+}
+.space-buttons .ant-btn {
+  margin-bottom: 8px;
+}
+@media (max-width: 768px) {
+  .space-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .space-header h2,
+  .space-space {
+    flex: 1 1 100%;
+    margin-bottom: 16px;
+  }
+}
+</style>

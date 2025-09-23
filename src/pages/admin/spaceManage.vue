@@ -100,7 +100,7 @@
 
           <!-- 操作按钮 -->
           <template v-else-if="column.key === 'action'">
-            <a-space>
+            <a-space wrap>
               <a-button type="link" :href="`/space_analyze?spaceId=${record.id}`" target="_blank">
                 分析
               </a-button>
@@ -173,6 +173,7 @@ const columns = [
     title: '操作',
     key: 'action',
     fixed: 'right',
+    width: 100,
   },
 ]
 
@@ -188,6 +189,7 @@ const pagination = computed(() => {
   }
 })
 
+// 表格变化
 const doTableChange = (page: any, filters: any, sorter: any) => {
   searchParams.current = page.current
   searchParams.pageSize = page.pageSize
@@ -206,6 +208,7 @@ const searchParams = reactive<API.SpaceQueryRequest>({
   sortOrder: 'descend',
 })
 
+//删除图片
 const doDelete = async (id: number) => {
   if (!id) {
     return

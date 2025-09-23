@@ -2,43 +2,48 @@
   <div class="picture-search-form">
     <!-- 搜索表单 -->
     <a-form layout="inline" :model="searchParams" @finish="doSearch">
-      <a-form-item label="关键词" name="searchText">
-        <a-input
-          v-model:value="searchParams.searchText"
-          placeholder="从名称和简介搜索"
-          allow-clear
-        />
-      </a-form-item>
-      <a-form-item label="分类" name="category">
-        <a-auto-complete
-          v-model:value="searchParams.category"
-          style="min-width: 180px"
-          :options="categoryOptions"
-          placeholder="请输入分类"
-          allowClear
-        />
-      </a-form-item>
-      <a-form-item label="标签" name="tags">
-        <a-select
-          v-model:value="searchParams.tags"
-          style="min-width: 180px"
-          :options="tagOptions"
-          mode="tags"
-          placeholder="请输入标签"
-          allowClear
-        />
-      </a-form-item>
-      <a-form-item label="日期" name="">
-        <a-range-picker
-          style="width: 400px"
-          show-time
-          v-model:value="dateRange"
-          :placeholder="['编辑开始日期', '编辑结束时间']"
-          format="YYYY/MM/DD HH:mm:ss"
-          :presets="rangePresets"
-          @change="onRangeChange"
-        />
-      </a-form-item>
+      <a-space>
+        <a-form-item label="关键词" name="searchText">
+          <a-input
+            v-model:value="searchParams.searchText"
+            placeholder="从名称和简介搜索"
+            allow-clear
+          />
+        </a-form-item>
+        <a-form-item label="日期" name="">
+          <a-range-picker
+            style="width: 200px"
+            show-time
+            v-model:value="dateRange"
+            :placeholder="['开始日期', '结束']"
+            format="YYYY/MM/DD HH:mm:ss"
+            :presets="rangePresets"
+            @change="onRangeChange"
+          />
+        </a-form-item>
+      </a-space>
+
+      <a-space>
+        <a-form-item label="分类" name="category">
+          <a-auto-complete
+            v-model:value="searchParams.category"
+            style="min-width: 180px"
+            :options="categoryOptions"
+            placeholder="请输入分类"
+            allowClear
+          />
+        </a-form-item>
+        <a-form-item label="标签" name="tags">
+          <a-select
+            v-model:value="searchParams.tags"
+            style="min-width: 180px"
+            :options="tagOptions"
+            mode="tags"
+            placeholder="请输入标签"
+            allowClear
+          /> </a-form-item
+      ></a-space>
+
       <a-space>
         <a-form-item label="名称" name="name">
           <a-input v-model:value="searchParams.name" placeholder="请输入名称" allow-clear />
@@ -46,6 +51,9 @@
         <a-form-item label="简介" name="introduction">
           <a-input v-model:value="searchParams.introduction" placeholder="请输入简介" allow-clear />
         </a-form-item>
+      </a-space>
+
+      <a-space>
         <a-form-item>
           <a-space>
             <a-button type="primary" html-type="submit" style="width: 96px">搜索</a-button>

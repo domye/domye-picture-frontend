@@ -81,15 +81,18 @@ import { useRoute } from 'vue-router'
 import ImageCropper from '@/components/ImageCropper.vue'
 import { getSpaceVoByIdUsingGet } from '@/api/spaceController'
 const route = useRoute()
+
 // 数据
 const picture = ref<API.PictureVO>()
 const pictureForm = reactive<API.PictureEditRequest>({})
 const categoryOptions = ref<string[]>([])
 const tagOptions = ref<string[]>([])
+
 // 空间 id
 const spaceId = computed(() => {
   return route.query?.spaceId
 })
+
 // 获取老数据
 const getOldPicture = async () => {
   // 获取数据
@@ -108,6 +111,7 @@ const getOldPicture = async () => {
     }
   }
 }
+
 // 图片编辑弹窗引用
 const imageCropperRef = ref()
 
@@ -116,11 +120,6 @@ const doEditPicture = () => {
   if (imageCropperRef.value) {
     imageCropperRef.value.openModal()
   }
-}
-
-// 编辑成功事件
-const onCropSuccess = (newPicture: API.PictureVO) => {
-  picture.value = newPicture
 }
 
 //上传图片
@@ -135,6 +134,7 @@ const handleSubmit = async (values: any) => {
     spaceId: spaceId.value,
     ...values,
   })
+
   // 操作成功
   if (res.data.code === 0 && res.data.data) {
     message.success('创建成功')

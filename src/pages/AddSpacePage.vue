@@ -5,6 +5,7 @@
       {{ route.query?.id ? '修改' : '创建' }}{{ SPACE_TYPE_MAP[spaceType] }}
     </h2>
 
+    <!-- 创建选项 -->
     <a-form layout="vertical" :model="formData" @finish="handleSubmit">
       <a-form-item label="空间名称" name="spaceName">
         <a-input v-model:value="formData.spaceName" placeholder="请输入空间名称" allow-clear />
@@ -18,6 +19,8 @@
           allow-clear
         />
       </a-form-item>
+
+      <!-- 提交按钮 -->
       <a-form-item>
         <a-button type="primary" html-type="submit" style="width: 100%" :loading="loading">
           提交
@@ -25,6 +28,8 @@
       </a-form-item>
     </a-form>
   </div>
+
+  <!-- 空间级别介绍 -->
   <a-card title="空间级别介绍" id="spaceLevelCard">
     <a-typography-paragraph> 目前仅支持开通普通版 </a-typography-paragraph>
     <a-typography-paragraph v-for="spaceLevel in spaceLevelList">
@@ -51,15 +56,15 @@ import router from '@/router'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { formatSize } from '@/utils'
 const route = useRoute()
 
-import { filesize } from 'filesize'
-const formatSize = (bytes) => filesize(bytes, { base: 2, standard: 'jedec', unit: 'MB' })
 // 数据
 const formData = reactive<API.SpaceAddRequest | API.SpaceUpdateRequest>({
   spaceName: '',
   spaceLevel: SPACE_LEVEL_ENUM.COMMON,
 })
+
 // 空间类别
 const spaceType = computed(() => {
   if (route.query?.type) {
@@ -88,6 +93,8 @@ const getOldSpace = async () => {
     }
   }
 }
+
+// 提交
 const handleSubmit = async (values: any) => {
   const spaceId = oldSpace.value?.id
   loading.value = true
@@ -116,6 +123,7 @@ const handleSubmit = async (values: any) => {
   }
   loading.value = false
 }
+
 // 获取标签分类
 const getSpaceLevelOptions = async () => {
   const res = await listSpaceLevelUsingGet()
@@ -131,6 +139,7 @@ const getSpaceLevelOptions = async () => {
     message.error('获取标签分类失败，' + res.data.message)
   }
 }
+
 // 页面加载时请求一次
 onMounted(() => {
   getSpaceLevelOptions()

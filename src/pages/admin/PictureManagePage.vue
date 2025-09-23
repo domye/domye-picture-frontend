@@ -315,6 +315,7 @@ const pagination = computed(() => {
   }
 })
 
+// 表格变化
 const doTableChange = (page: any, filters: any, sorter: any) => {
   searchParams.current = page.current
   searchParams.pageSize = page.pageSize
@@ -343,6 +344,7 @@ const resetSearch = () => {
   fetchData()
 }
 
+// 删除图片
 const doDelete = async (id: number) => {
   if (!id) {
     return
