@@ -2,7 +2,7 @@
 /* eslint-disable */
 import request from '@/request'
 
-/** addSpaceUser POST /api/spaceUser/add */
+/** 添加成员到空间 POST /api/spaceUser/add */
 export async function addSpaceUserUsingPost(
   body: API.SpaceUserAddRequest,
   options?: { [key: string]: any }
@@ -17,7 +17,7 @@ export async function addSpaceUserUsingPost(
   })
 }
 
-/** deleteSpaceUser POST /api/spaceUser/delete */
+/** 从空间移除成员 POST /api/spaceUser/delete */
 export async function deleteSpaceUserUsingPost(
   body: API.DeleteRequest,
   options?: { [key: string]: any }
@@ -32,7 +32,7 @@ export async function deleteSpaceUserUsingPost(
   })
 }
 
-/** editSpaceUser POST /api/spaceUser/edit */
+/** 编辑成员信息（设置权限） POST /api/spaceUser/edit */
 export async function editSpaceUserUsingPost(
   body: API.SpaceUserEditRequest,
   options?: { [key: string]: any }
@@ -47,7 +47,7 @@ export async function editSpaceUserUsingPost(
   })
 }
 
-/** getSpaceUser POST /api/spaceUser/get */
+/** 查询某个成员在某个空间的信息 POST /api/spaceUser/get */
 export async function getSpaceUserUsingPost(
   body: API.SpaceUserQueryRequest,
   options?: { [key: string]: any }
@@ -62,7 +62,7 @@ export async function getSpaceUserUsingPost(
   })
 }
 
-/** listSpaceUser POST /api/spaceUser/list */
+/** 查询成员信息列表 POST /api/spaceUser/list */
 export async function listSpaceUserUsingPost(
   body: API.SpaceUserQueryRequest,
   options?: { [key: string]: any }
@@ -77,7 +77,7 @@ export async function listSpaceUserUsingPost(
   })
 }
 
-/** listMyTeamSpace POST /api/spaceUser/list/my */
+/** 查询我加入的团队空间列表 POST /api/spaceUser/list/my */
 export async function listMyTeamSpaceUsingPost(options?: { [key: string]: any }) {
   return request<API.BaseResponseListSpaceUserVO_>('/api/spaceUser/list/my', {
     method: 'POST',

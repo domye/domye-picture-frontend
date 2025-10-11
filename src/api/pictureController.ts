@@ -2,7 +2,7 @@
 /* eslint-disable */
 import request from '@/request'
 
-/** deletePicture POST /api/picture/delete */
+/** 删除图片 POST /api/picture/delete */
 export async function deletePictureUsingPost(
   body: API.DeleteRequest,
   options?: { [key: string]: any }
@@ -17,7 +17,7 @@ export async function deletePictureUsingPost(
   })
 }
 
-/** editPicture POST /api/picture/edit */
+/** 编辑图片 POST /api/picture/edit */
 export async function editPictureUsingPost(
   body: API.PictureEditRequest,
   options?: { [key: string]: any }
@@ -32,7 +32,7 @@ export async function editPictureUsingPost(
   })
 }
 
-/** getPictureById GET /api/picture/get */
+/** 根据id获取图片 GET /api/picture/get */
 export async function getPictureByIdUsingGet(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getPictureByIdUsingGETParams,
@@ -47,7 +47,7 @@ export async function getPictureByIdUsingGet(
   })
 }
 
-/** getPictureVOById GET /api/picture/get/vo */
+/** 根据id获取脱敏后的图片信息 GET /api/picture/get/vo */
 export async function getPictureVoByIdUsingGet(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getPictureVOByIdUsingGETParams,
@@ -62,7 +62,7 @@ export async function getPictureVoByIdUsingGet(
   })
 }
 
-/** listPictureByPage POST /api/picture/list/page */
+/** 分页获取图片列表（仅管理员可用） POST /api/picture/list/page */
 export async function listPictureByPageUsingPost(
   body: API.PictureQueryRequest,
   options?: { [key: string]: any }
@@ -77,7 +77,7 @@ export async function listPictureByPageUsingPost(
   })
 }
 
-/** listPictureVOByPage POST /api/picture/list/page/vo */
+/** 分页获取脱敏后的图片列表 POST /api/picture/list/page/vo */
 export async function listPictureVoByPageUsingPost(
   body: API.PictureQueryRequest,
   options?: { [key: string]: any }
@@ -92,7 +92,7 @@ export async function listPictureVoByPageUsingPost(
   })
 }
 
-/** doPictureReview POST /api/picture/review */
+/** 图片审核 POST /api/picture/review */
 export async function doPictureReviewUsingPost(
   body: API.PictureReviewRequest,
   options?: { [key: string]: any }
@@ -107,7 +107,7 @@ export async function doPictureReviewUsingPost(
   })
 }
 
-/** searchPictureByColor POST /api/picture/search/color */
+/** 根据颜色搜索图片 POST /api/picture/search/color */
 export async function searchPictureByColorUsingPost(
   body: API.SearchPictureByColorRequest,
   options?: { [key: string]: any }
@@ -122,7 +122,7 @@ export async function searchPictureByColorUsingPost(
   })
 }
 
-/** listPictureTagCategory GET /api/picture/tag_category */
+/** 获取图片标签分类 GET /api/picture/tag_category */
 export async function listPictureTagCategoryUsingGet(options?: { [key: string]: any }) {
   return request<API.BaseResponsePictureTagCategory_>('/api/picture/tag_category', {
     method: 'GET',
@@ -130,7 +130,7 @@ export async function listPictureTagCategoryUsingGet(options?: { [key: string]: 
   })
 }
 
-/** updatePicture POST /api/picture/update */
+/** 管理员更新图片 POST /api/picture/update */
 export async function updatePictureUsingPost(
   body: API.PictureUpdateRequest,
   options?: { [key: string]: any }
@@ -145,7 +145,7 @@ export async function updatePictureUsingPost(
   })
 }
 
-/** uploadPicture POST /api/picture/upload */
+/** 上传图片 POST /api/picture/upload */
 export async function uploadPictureUsingPost(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.uploadPictureUsingPOSTParams,

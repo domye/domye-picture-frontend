@@ -2,7 +2,7 @@
 /* eslint-disable */
 import request from '@/request'
 
-/** getSpaceCategoryAnalyze POST /api/space/analyze/category */
+/** 获取空间分类分析 POST /api/space/analyze/category */
 export async function getSpaceCategoryAnalyzeUsingPost(
   body: API.SpaceCategoryAnalyzeRequest,
   options?: { [key: string]: any }
@@ -17,7 +17,7 @@ export async function getSpaceCategoryAnalyzeUsingPost(
   })
 }
 
-/** getSpaceRankAnalyze POST /api/space/analyze/rank */
+/** 获取空间排名分析 POST /api/space/analyze/rank */
 export async function getSpaceRankAnalyzeUsingPost(
   body: API.SpaceRankAnalyzeRequest,
   options?: { [key: string]: any }
@@ -32,7 +32,7 @@ export async function getSpaceRankAnalyzeUsingPost(
   })
 }
 
-/** getSpaceSizeAnalyze POST /api/space/analyze/size */
+/** 获取空间大小分析 POST /api/space/analyze/size */
 export async function getSpaceSizeAnalyzeUsingPost(
   body: API.SpaceSizeAnalyzeRequest,
   options?: { [key: string]: any }
@@ -47,7 +47,7 @@ export async function getSpaceSizeAnalyzeUsingPost(
   })
 }
 
-/** getSpaceTagAnalyze POST /api/space/analyze/tag */
+/** 获取空间标签分析 POST /api/space/analyze/tag */
 export async function getSpaceTagAnalyzeUsingPost(
   body: API.SpaceTagAnalyzeRequest,
   options?: { [key: string]: any }
@@ -62,7 +62,7 @@ export async function getSpaceTagAnalyzeUsingPost(
   })
 }
 
-/** getSpaceUsageAnalyze POST /api/space/analyze/usage */
+/** 获取空间使用状态 POST /api/space/analyze/usage */
 export async function getSpaceUsageAnalyzeUsingPost(
   body: API.SpaceUsageAnalyzeRequest,
   options?: { [key: string]: any }
@@ -77,7 +77,7 @@ export async function getSpaceUsageAnalyzeUsingPost(
   })
 }
 
-/** getSpaceUserAnalyze POST /api/space/analyze/user */
+/** 获取空间用户分析 POST /api/space/analyze/user */
 export async function getSpaceUserAnalyzeUsingPost(
   body: API.SpaceUserAnalyzeRequest,
   options?: { [key: string]: any }

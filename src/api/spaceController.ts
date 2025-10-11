@@ -2,7 +2,7 @@
 /* eslint-disable */
 import request from '@/request'
 
-/** addSpace POST /api/space/add */
+/** 创建空间 POST /api/space/add */
 export async function addSpaceUsingPost(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.addSpaceUsingPOSTParams,
@@ -17,7 +17,7 @@ export async function addSpaceUsingPost(
   })
 }
 
-/** deleteSpace POST /api/space/delete */
+/** 删除空间 POST /api/space/delete */
 export async function deleteSpaceUsingPost(
   body: API.DeleteRequest,
   options?: { [key: string]: any }
@@ -32,7 +32,7 @@ export async function deleteSpaceUsingPost(
   })
 }
 
-/** editSpace POST /api/space/edit */
+/** 编辑空间 POST /api/space/edit */
 export async function editSpaceUsingPost(
   body: API.SpaceEditRequest,
   options?: { [key: string]: any }
@@ -47,7 +47,7 @@ export async function editSpaceUsingPost(
   })
 }
 
-/** getSpaceById GET /api/space/get */
+/** 根据id获取空间 GET /api/space/get */
 export async function getSpaceByIdUsingGet(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getSpaceByIdUsingGETParams,
@@ -62,7 +62,7 @@ export async function getSpaceByIdUsingGet(
   })
 }
 
-/** getSpaceVOById GET /api/space/get/vo */
+/** 根据id获取空间封装类 GET /api/space/get/vo */
 export async function getSpaceVoByIdUsingGet(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.getSpaceVOByIdUsingGETParams,
@@ -77,7 +77,7 @@ export async function getSpaceVoByIdUsingGet(
   })
 }
 
-/** listSpaceLevel GET /api/space/list/level */
+/** 获取空间权限列表 GET /api/space/list/level */
 export async function listSpaceLevelUsingGet(options?: { [key: string]: any }) {
   return request<API.BaseResponseListSpaceLevel_>('/api/space/list/level', {
     method: 'GET',
@@ -85,7 +85,7 @@ export async function listSpaceLevelUsingGet(options?: { [key: string]: any }) {
   })
 }
 
-/** listSpaceByPage POST /api/space/list/page */
+/** 分页获取空间列表 POST /api/space/list/page */
 export async function listSpaceByPageUsingPost(
   body: API.SpaceQueryRequest,
   options?: { [key: string]: any }
@@ -100,7 +100,7 @@ export async function listSpaceByPageUsingPost(
   })
 }
 
-/** listSpaceVOByPage POST /api/space/list/page/vo */
+/** 分页获取空间封装类列表 POST /api/space/list/page/vo */
 export async function listSpaceVoByPageUsingPost(
   body: API.SpaceQueryRequest,
   options?: { [key: string]: any }
@@ -115,7 +115,7 @@ export async function listSpaceVoByPageUsingPost(
   })
 }
 
-/** updateSpace POST /api/space/update */
+/** 更新空间 POST /api/space/update */
 export async function updateSpaceUsingPost(
   body: API.SpaceUpdateRequest,
   options?: { [key: string]: any }

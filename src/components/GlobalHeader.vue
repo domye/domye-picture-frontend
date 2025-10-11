@@ -118,14 +118,19 @@ const originItems = [
     title: '主页',
   },
   {
-    key: '/admin/userManage',
-    label: '用户管理',
-    title: '用户管理',
+    key: '/rank',
+    label: '排行榜',
+    title: '排行榜',
   },
   {
     key: '/add_picture',
     label: '创建图片',
     title: '创建图片',
+  },
+  {
+    key: '/admin/userManage',
+    label: '用户管理',
+    title: '用户管理',
   },
   {
     key: '/admin/pictureManage',

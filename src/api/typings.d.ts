@@ -59,6 +59,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseListUserActiveRankItemVO_ = {
+    code?: number
+    data?: UserActiveRankItemVO[]
+    message?: string
+  }
+
   type BaseResponseLoginUserVO_ = {
     code?: number
     data?: LoginUserVO
@@ -143,12 +149,6 @@ declare namespace API {
     message?: string
   }
 
-  type BaseResponseString_ = {
-    code?: number
-    data?: string
-    message?: string
-  }
-
   type BaseResponseUser_ = {
     code?: number
     data?: User
@@ -183,6 +183,11 @@ declare namespace API {
   type getSpaceVOByIdUsingGETParams = {
     /** id */
     id?: number
+  }
+
+  type getUserActivityScoreUsingGETParams = {
+    size?: number
+    value?: number
   }
 
   type getUserByIdUsingGETParams = {
@@ -500,7 +505,7 @@ declare namespace API {
     id?: number
     space?: SpaceVO
     spaceId?: number
-    spaceRole?: number
+    spaceRole?: string
     updateTime?: string
     user?: UserVO
     userId?: number
@@ -543,12 +548,16 @@ declare namespace API {
     userRole?: string
   }
 
-  type UserAddRequest = {
-    userAccount?: string
-    userAvatar?: string
-    userName?: string
-    userProfile?: string
-    userRole?: string
+  type UserActiveRankItemVO = {
+    rank?: number
+    score?: number
+    user?: UserVO
+  }
+
+  type UserActivityScoreAddRequest = {
+    path?: string
+    pictureId?: number
+    uploadPicture?: boolean
   }
 
   type UserLoginRequest = {
