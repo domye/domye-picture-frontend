@@ -65,6 +65,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseListUserVO_ = {
+    code?: number
+    data?: UserVO[]
+    message?: string
+  }
+
   type BaseResponseLoginUserVO_ = {
     code?: number
     data?: LoginUserVO
@@ -149,6 +155,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseString_ = {
+    code?: number
+    data?: string
+    message?: string
+  }
+
   type BaseResponseUser_ = {
     code?: number
     data?: User
@@ -163,6 +175,18 @@ declare namespace API {
 
   type DeleteRequest = {
     id?: number
+  }
+
+  type FilterListRequest = {
+    mode?: number
+    type?: number
+    userId?: number
+  }
+
+  type getFilterListUsingGETParams = {
+    mode?: number
+    type?: number
+    userId?: number
   }
 
   type getPictureByIdUsingGETParams = {
@@ -552,12 +576,6 @@ declare namespace API {
     rank?: number
     score?: number
     user?: UserVO
-  }
-
-  type UserActivityScoreAddRequest = {
-    path?: string
-    pictureId?: number
-    uploadPicture?: boolean
   }
 
   type UserLoginRequest = {
