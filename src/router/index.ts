@@ -13,6 +13,7 @@ import SpaceDetailPage from '@/pages/SpaceDetailPage.vue'
 import SpaceAnalyzePage from '@/pages/SpaceAnalyzePage.vue'
 import SpaceUserManage from '@/pages/admin/spaceUserManage.vue'
 import Rank from '@/pages/Rank.vue'
+import Wxbind from '@/pages/user/wxbind.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -73,6 +74,11 @@ const router = createRouter({
       path: '/rank',
       name: '排行榜',
       component: Rank,
+    },
+    {
+      path: '/bind',
+      name: 'wx',
+      component: Wxbind,
     },
     {
       path: '/admin/pictureManage',

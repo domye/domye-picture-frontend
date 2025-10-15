@@ -131,6 +131,18 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseQrcodeStatusVO_ = {
+    code?: number
+    data?: QrcodeStatusVO
+    message?: string
+  }
+
+  type BaseResponseQrcodeVO_ = {
+    code?: number
+    data?: QrcodeVO
+    message?: string
+  }
+
   type BaseResponseSpace_ = {
     code?: number
     data?: Space
@@ -171,6 +183,33 @@ declare namespace API {
     code?: number
     data?: UserVO
     message?: string
+  }
+
+  type BaseWxMsgResVo = {
+    content?: string
+    createTime?: number
+    fromUserName?: string
+    msgType?: string
+    toUserName?: string
+  }
+
+  type bindWxUsingPOSTParams = {
+    /** openId */
+    openId: string
+    /** sceneId */
+    sceneId: number
+    /** userId */
+    userId: number
+  }
+
+  type checkQrStatusUsingGETParams = {
+    /** sceneId */
+    sceneId: number
+  }
+
+  type connectUsingGETParams = {
+    /** sceneId */
+    sceneId: number
   }
 
   type DeleteRequest = {
@@ -378,6 +417,26 @@ declare namespace API {
     userId?: number
   }
 
+  type QrcodeStatusVO = {
+    code?: string
+    message?: string
+    openId?: string
+    sceneId?: number
+    status?: string
+  }
+
+  type QrcodeVO = {
+    sceneId?: number
+    ticket?: string
+    url?: string
+  }
+
+  type receiveMessageUsingPOSTParams = {
+    nonce?: string
+    signature?: string
+    timestamp?: string
+  }
+
   type SearchPictureByColorRequest = {
     picColor?: string
     spaceId?: number
@@ -552,6 +611,17 @@ declare namespace API {
     userId?: number
   }
 
+  type SseEmitter = {
+    timeout?: number
+  }
+
+  type updateQrStatusUsingPOSTParams = {
+    /** openId */
+    openId: string
+    /** sceneId */
+    sceneId: number
+  }
+
   type uploadPictureUsingPOSTParams = {
     id?: number
     picColor?: string
@@ -570,6 +640,7 @@ declare namespace API {
     userPassword?: string
     userProfile?: string
     userRole?: string
+    wxOpenId?: string
   }
 
   type UserActiveRankItemVO = {
@@ -617,5 +688,19 @@ declare namespace API {
     userName?: string
     userProfile?: string
     userRole?: string
+  }
+
+  type verifyCodeUsingPOSTParams = {
+    /** code */
+    code: string
+    /** sceneId */
+    sceneId: number
+  }
+
+  type verifyUsingGETParams = {
+    echostr?: string
+    nonce?: string
+    signature?: string
+    timestamp?: string
   }
 }
