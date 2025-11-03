@@ -69,13 +69,18 @@ const columns = [
     title: '描述',
     dataIndex: 'description',
   },
-  {
-    title: '创建人',
-    dataIndex: 'createUser',
-  },
+
   {
     title: '状态',
     dataIndex: 'status',
+  },
+  {
+    title: '总票数',
+    dataIndex: 'totalVotes',
+  },
+  {
+    title: '创建人',
+    dataIndex: 'createUser',
   },
   {
     title: '开始时间',
