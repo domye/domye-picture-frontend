@@ -1,6 +1,3 @@
-Fitten Code
-为了实现这个需求，你可以通过CSS媒体查询来根据屏幕宽度调整标题和按钮的布局。在你的代码中，你可以添加一些CSS样式来实现这个功能。以下是修改后的代码示例：
-vue 复制 插入 展开
 <template>
   <PictureSearchForm :onSearch="onSearch" />
   <a-form-item label="按颜色搜索" style="margin-top: 16px">
