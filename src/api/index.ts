@@ -9,9 +9,9 @@ import * as spaceController from './spaceController'
 import * as spaceAnalyzeController from './spaceAnalyzeController'
 import * as spaceUserController from './spaceUserController'
 import * as userController from './userController'
+import * as voteController from './voteController'
 import * as wxMessageController from './wxMessageController'
 import * as wxQrCodeController from './wxQrCodeController'
-import * as sseController from './sseController'
 export default {
   filterListController,
   pictureController,
@@ -20,7 +20,7 @@ export default {
   spaceAnalyzeController,
   spaceUserController,
   userController,
+  voteController,
   wxMessageController,
   wxQrCodeController,
-  sseController,
 }

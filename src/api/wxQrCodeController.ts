@@ -2,8 +2,8 @@
 /* eslint-disable */
 import request from '@/request'
 
-/** generateQrCode GET /api/wx/qr/generate */
-export async function generateQrCodeUsingGet(options?: { [key: string]: any }) {
+/** test GET /api/wx/qr/generate */
+export async function testUsingGet(options?: { [key: string]: any }) {
   return request<API.BaseResponseQrcodeVO_>('/api/wx/qr/generate', {
     method: 'GET',
     ...(options || {}),

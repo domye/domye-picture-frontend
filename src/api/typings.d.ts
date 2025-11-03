@@ -113,6 +113,18 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponsePageVoteActivity_ = {
+    code?: number
+    data?: PageVoteActivity_
+    message?: string
+  }
+
+  type BaseResponsePageVoteActivityVO_ = {
+    code?: number
+    data?: PageVoteActivityVO_
+    message?: string
+  }
+
   type BaseResponsePicture_ = {
     code?: number
     data?: Picture
@@ -185,6 +197,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseVoteActivityDetailVO_ = {
+    code?: number
+    data?: VoteActivityDetailVO
+    message?: string
+  }
+
   type BaseWxMsgResVo = {
     content?: string
     createTime?: number
@@ -193,21 +211,7 @@ declare namespace API {
     toUserName?: string
   }
 
-  type bindWxUsingPOSTParams = {
-    /** openId */
-    openId: string
-    /** sceneId */
-    sceneId: number
-    /** userId */
-    userId: number
-  }
-
   type checkQrStatusUsingGETParams = {
-    /** sceneId */
-    sceneId: number
-  }
-
-  type connectUsingGETParams = {
     /** sceneId */
     sceneId: number
   }
@@ -263,6 +267,11 @@ declare namespace API {
     id?: number
   }
 
+  type getVoteActivitiesUsingGETParams = {
+    /** id */
+    id: number
+  }
+
   type LoginUserVO = {
     createTime?: string
     editTime?: string
@@ -311,6 +320,22 @@ declare namespace API {
     current?: number
     pages?: number
     records?: UserVO[]
+    size?: number
+    total?: number
+  }
+
+  type PageVoteActivity_ = {
+    current?: number
+    pages?: number
+    records?: VoteActivity[]
+    size?: number
+    total?: number
+  }
+
+  type PageVoteActivityVO_ = {
+    current?: number
+    pages?: number
+    records?: VoteActivityVO[]
     size?: number
     total?: number
   }
@@ -426,6 +451,7 @@ declare namespace API {
   }
 
   type QrcodeVO = {
+    code?: string
     sceneId?: number
     ticket?: string
     url?: string
@@ -611,17 +637,6 @@ declare namespace API {
     userId?: number
   }
 
-  type SseEmitter = {
-    timeout?: number
-  }
-
-  type updateQrStatusUsingPOSTParams = {
-    /** openId */
-    openId: string
-    /** sceneId */
-    sceneId: number
-  }
-
   type uploadPictureUsingPOSTParams = {
     id?: number
     picColor?: string
@@ -690,17 +705,92 @@ declare namespace API {
     userRole?: string
   }
 
-  type verifyCodeUsingPOSTParams = {
-    /** code */
-    code: string
-    /** sceneId */
-    sceneId: number
-  }
-
   type verifyUsingGETParams = {
     echostr?: string
     nonce?: string
     signature?: string
     timestamp?: string
+  }
+
+  type VoteActivity = {
+    createTime?: string
+    createUser?: number
+    description?: string
+    endTime?: string
+    id?: number
+    maxVotesPerUser?: number
+    startTime?: string
+    status?: number
+    title?: string
+    totalVotes?: number
+    updateTime?: string
+  }
+
+  type VoteActivityAddRequest = {
+    description?: string
+    endTime?: string
+    maxVotesPerUser?: number
+    options?: VoteOptionAddRequest[]
+    startTime?: string
+    title?: string
+  }
+
+  type VoteActivityDetailVO = {
+    description?: string
+    endTime?: string
+    id?: number
+    maxVotesPerUser?: number
+    options?: VoteOptionVO[]
+    startTime?: string
+    status?: number
+    title?: string
+    totalVotes?: number
+  }
+
+  type VoteActivityQueryRequest = {
+    createUser?: number
+    current?: number
+    description?: string
+    endTime?: string
+    id?: number
+    pageSize?: number
+    searchText?: string
+    sortField?: string
+    sortOrder?: string
+    startTime?: string
+    status?: number
+    title?: string
+  }
+
+  type VoteActivityVO = {
+    createUser?: number
+    description?: string
+    endTime?: string
+    id?: number
+    maxVotesPerUser?: number
+    startTime?: string
+    status?: number
+    title?: string
+    totalVotes?: number
+  }
+
+  type VoteEndRequest = {
+    activityId?: number
+  }
+
+  type VoteOptionAddRequest = {
+    optionText?: string
+  }
+
+  type VoteOptionVO = {
+    id?: number
+    optionText?: string
+    voteCount?: number
+  }
+
+  type VoteRequest = {
+    activityId?: number
+    optionId?: number
+    userId?: number
   }
 }

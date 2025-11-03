@@ -2,18 +2,17 @@ import { createRouter, createWebHistory } from 'vue-router'
 import UserRegisterPage from '@/pages/user/UserRegisterPage.vue'
 import UserLoginPage from '@/pages/user/UserLoginPage.vue'
 import UserManagePage from '@/pages/admin/UserManagePage.vue'
-import AddPicturePage from '@/pages/AddPicturePage.vue'
+import AddPicturePage from '@/pages/picture/AddPicturePage.vue'
 import PictureManagePage from '@/pages/admin/PictureManagePage.vue'
 import HomePage from '@/pages/HomePage.vue'
-import PictureDetailPage from '@/pages/PictureDetailPage.vue'
+import PictureDetailPage from '@/pages/picture/PictureDetailPage.vue'
 import SpaceManagePage from '@/pages/admin/spaceManage.vue'
-import AddSpacePage from '@/pages/AddSpacePage.vue'
-import MySpacePage from '@/pages/MySpace.vue'
-import SpaceDetailPage from '@/pages/SpaceDetailPage.vue'
-import SpaceAnalyzePage from '@/pages/SpaceAnalyzePage.vue'
+import AddSpacePage from '@/pages/space/AddSpacePage.vue'
+import MySpacePage from '@/pages/space/MySpace.vue'
+import SpaceDetailPage from '@/pages/space/SpaceDetailPage.vue'
+import SpaceAnalyzePage from '@/pages/space/SpaceAnalyzePage.vue'
 import SpaceUserManage from '@/pages/admin/spaceUserManage.vue'
 import Rank from '@/pages/Rank.vue'
-import Wxbind from '@/pages/user/wxbind.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -74,11 +73,6 @@ const router = createRouter({
       path: '/rank',
       name: '排行榜',
       component: Rank,
-    },
-    {
-      path: '/bind',
-      name: 'wx',
-      component: Wxbind,
     },
     {
       path: '/admin/pictureManage',
