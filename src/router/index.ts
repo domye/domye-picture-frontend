@@ -26,6 +26,7 @@ import SpaceUserManage from '@/pages/admin/spaceUserManage.vue'
 import VoteManagePage from '@/pages/admin/VoteManagePage.vue'
 import AddVoteActivityPage from '@/pages/vote/AddVoteActivityPage.vue'
 import VotePage from '@/pages/vote/VotePage.vue'
+import VoteDetailPage from '@/pages/vote/VoteDetailPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -100,6 +101,12 @@ const router = createRouter({
       path: '/vote',
       name: '投票',
       component: VotePage,
+    },
+    {
+      path: '/vote/detail/:id',
+      name: '投票详情',
+      component: VoteDetailPage,
+      props: true,
     },
 
     // 管理员相关路由

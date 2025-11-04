@@ -20,17 +20,26 @@
             :placeholder="['开始时间', '结束时间']"
           />
         </a-form-item>
+
+        <a-form-item label="每人最多投票数" name="maxVotesPerUser">
+          <a-input-number
+            v-model:value="formData.maxVotesPerUser"
+            :min="1"
+            :max="10"
+            style="width: 100%"
+          />
+        </a-form-item>
       </a-card>
 
       <!-- 投票选项 -->
       <a-card title="投票选项" class="form-card">
         <div v-for="(option, index) in formData.options" :key="index" class="option-item">
           <a-form-item
-            :name="['options', index, 'content']"
+            :name="['options', index, 'optionText']"
             :rules="[{ required: true, message: '请输入选项内容' }]"
           >
             <a-input
-              v-model:value="option.content"
+              v-model:value="option.optionText"
               placeholder="请输入选项内容"
               :addon-before="`选项 ${index + 1}`"
             />
@@ -59,6 +68,7 @@
     </a-form>
   </div>
 </template>
+
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
@@ -89,6 +99,7 @@ const rules = {
   title: [{ required: true, message: '请输入活动标题' }],
   description: [{ required: true, message: '请输入活动描述' }],
   timeRange: [{ required: true, message: '请选择活动时间' }],
+  maxVotesPerUser: [{ required: true, message: '请设置每人最多投票数' }],
 }
 
 // 添加选项
@@ -118,17 +129,21 @@ const handleSubmit = async () => {
   loading.value = true
   try {
     const params = {
-      ...formData,
+      title: formData.title,
+      description: formData.description,
       startTime: formData.timeRange[0].toISOString(),
       endTime: formData.timeRange[1].toISOString(),
+      maxVotesPerUser: formData.maxVotesPerUser,
+      options: formData.options.map((option) => ({
+        optionText: option.optionText,
+      })),
     }
-    delete params.timeRange
 
     const res = await addVoteActivitiesUsingPost(params)
 
     if (res.data.code === 0) {
       message.success('创建成功')
-      router.push('/admin/vote-manage')
+      router.push('/vote/detail/' + res.data.data.id)
     } else {
       message.error(res.data.message || '操作失败')
     }
@@ -139,3 +154,32 @@ const handleSubmit = async () => {
   }
 }
 </script>
+
+<style scoped>
+#addVoteActivityPage {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.form-card {
+  margin-bottom: 24px;
+}
+
+.option-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.option-item .ant-form-item {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 24px;
+}
+</style>

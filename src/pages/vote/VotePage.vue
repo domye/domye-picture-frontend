@@ -184,7 +184,7 @@ const handleEdit = (record: any) => {
 
 // 查看活动
 const handleView = (record: any) => {
-  router.push(`/vote/detail?id=${record.id}`)
+  router.push(`/vote/detail/${record.id}`)
 }
 
 // 删除活动

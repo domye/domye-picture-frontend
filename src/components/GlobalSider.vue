@@ -24,6 +24,11 @@ const loginUserStore = useLoginUserStore()
 // 固定的菜单列表
 const fixedMenuItems = [
   {
+    key: '/vote',
+    label: '比赛',
+    icon: () => h(UserOutlined),
+  },
+  {
     key: '/',
     label: '公共图库',
     icon: () => h(PictureOutlined),

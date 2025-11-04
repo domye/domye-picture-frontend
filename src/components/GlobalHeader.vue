@@ -138,6 +138,11 @@ const originItems = [
     title: '图片管理',
   },
   {
+    key: '/admin/voteManage',
+    label: '投票管理',
+    title: '投票管理',
+  },
+  {
     key: '/admin/spaceManage',
     label: '空间管理',
     title: '空间管理',
