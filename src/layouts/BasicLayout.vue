@@ -99,4 +99,28 @@ const loginUserStore = useLoginUserStore()
   border-inline-end: none !important;
   border-radius: 8px !important;
 }
+
+/* 移动端适配 */
+@media (max-width: 992px) {
+  #basicLayout .content {
+    margin-left: 16px; /* 在小屏幕上减小左边距 */
+  }
+}
+
+@media (max-width: 768px) {
+  #basicLayout .header {
+    margin: 8px;
+  }
+  
+  #basicLayout .content {
+    margin: 0 8px 56px 8px; /* 在移动设备上居中显示 */
+  }
+  
+  #basicLayout :deep(.ant-layout-sider-zero-width-trigger) {
+    top: 16px;
+    right: 16px;
+    background: #748CBC;
+    border-radius: 4px;
+  }
+}
 </style>
