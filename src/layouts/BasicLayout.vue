@@ -1,7 +1,9 @@
 <template>
   <div id="basicLayout">
     <a-layout style="min-height: 100vh">
-      <a-layout-header class="header fade-in"><GlobalHeader /></a-layout-header>
+      <a-layout-header class="header fade-in" style="position: sticky; top: 0; z-index: 1000"
+        ><GlobalHeader
+      /></a-layout-header>
       <a-layout>
         <a-layout-sider
           v-if="loginUserStore.loginUser.id"
@@ -9,6 +11,7 @@
           width="180"
           breakpoint="lg"
           collapsed-width="0"
+          :style="{ position: 'sticky', top: '70px', height: 'fit-content', zIndex: 100 }"
         >
           <globalSider />
         </a-layout-sider>
@@ -70,7 +73,7 @@ const loginUserStore = useLoginUserStore()
   border-radius: 8px;
   margin: 0 16px 56px 16px;
   transition: all 0.3s ease;
-  margin-left: 32px; /* 保持增加的距离 */
+  margin-left: 32px;
 }
 
 #basicLayout .content:hover {
@@ -103,7 +106,7 @@ const loginUserStore = useLoginUserStore()
 /* 移动端适配 */
 @media (max-width: 992px) {
   #basicLayout .content {
-    margin-left: 1px; /* 在小屏幕上减小左边距 */
+    margin-left: 1px; /* 在小屏幕上调整左边距 */
   }
 }
 
