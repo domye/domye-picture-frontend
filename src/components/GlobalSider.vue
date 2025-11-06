@@ -58,7 +58,7 @@ const menuItems = computed(() => {
     return {
       key: '/space/' + spaceUser.spaceId,
       label: space?.spaceName,
-      class: `menu-item-${index}`
+      class: `menu-item-${index}`,
     }
   })
   const teamSpaceMenuGroup = {
@@ -112,7 +112,7 @@ const doMenuClick = ({ key }: { key: string }) => {
   padding: 16px 0;
   margin: 0;
   transition: all 0.3s ease;
-  height: calc(100vh - 150px); /* 调整高度以适应新的顶栏 */
+  height: calc(80vh - 150px); /* 调整高度以适应新的顶栏 */
   overflow: hidden;
 }
 

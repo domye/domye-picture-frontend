@@ -12,8 +12,8 @@
         >
           <globalSider />
         </a-layout-sider>
-        <a-layout-content class="content fade-in-delay-1"> 
-          <router-view /> 
+        <a-layout-content class="content fade-in-delay-1">
+          <router-view />
         </a-layout-content>
       </a-layout>
       <a-layout-footer class="footer fade-in-delay-2"> By Domye </a-layout-footer>
@@ -90,7 +90,7 @@ const loginUserStore = useLoginUserStore()
 #basicLayout :deep(.ant-layout-sider-zero-width-trigger) {
   top: 60px;
   right: 10px;
-  background: #748CBC;
+  background: #748cbc;
   border-radius: 4px;
 }
 
@@ -103,24 +103,19 @@ const loginUserStore = useLoginUserStore()
 /* 移动端适配 */
 @media (max-width: 992px) {
   #basicLayout .content {
-    margin-left: 16px; /* 在小屏幕上减小左边距 */
+    margin-left: 1px; /* 在小屏幕上减小左边距 */
   }
 }
 
 @media (max-width: 768px) {
   #basicLayout .header {
-    margin: 8px;
+    margin: 5px;
   }
-  
-  #basicLayout .content {
-    margin: 0 8px 56px 8px; /* 在移动设备上居中显示 */
-  }
-  
+
   #basicLayout :deep(.ant-layout-sider-zero-width-trigger) {
-    top: 16px;
-    right: 16px;
-    background: #748CBC;
+    background: #748cbc;
     border-radius: 4px;
+    z-index: 101;
   }
 }
 </style>
