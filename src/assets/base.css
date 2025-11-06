@@ -19,6 +19,13 @@
   --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
   --vt-c-text-dark-1: var(--vt-c-white);
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+  
+  /* 灰蓝色调 */
+  --color-primary: #748CBC;
+  --color-primary-light: #95a9d6;
+  --color-primary-dark: #3a5f8d;
+  --color-secondary: #a3b1d7;
+  --color-accent: #5a73a7;
 }
 
 /* semantic color variables for this project */
@@ -47,6 +54,11 @@
 
     --color-heading: var(--vt-c-text-dark-1);
     --color-text: var(--vt-c-text-dark-2);
+    
+    /* 暗色模式下的灰蓝色调 */
+    --color-primary: #748CBC;
+    --color-primary-light: #95a9d6;
+    --color-primary-dark: #3a5f8d;
   }
 }
 

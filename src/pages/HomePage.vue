@@ -1,21 +1,22 @@
 <template>
   <div id="homePage">
     <!-- 搜索框 -->
-    <div class="search-bar">
+    <div class="search-bar fade-in">
       <a-input-search
         v-model:value="searchParams.searchText"
         placeholder="从海量图片中搜索"
         enter-button="搜索"
         size="large"
         @search="doSearch"
+        class="search-input"
       />
     </div>
     <!-- 分类和标签筛选 -->
-    <a-tabs v-model:active-key="selectedCategory" @change="doSearch">
+    <a-tabs v-model:active-key="selectedCategory" @change="doSearch" class="fade-in-delay-1">
       <a-tab-pane key="all" tab="全部" />
       <a-tab-pane v-for="category in categoryList" :tab="category" :key="category" />
     </a-tabs>
-    <div class="tag-bar">
+    <div class="tag-bar fade-in-delay-2">
       <span style="margin-right: 8px">标签：</span>
       <a-space :size="[0, 8]" wrap>
         <a-checkable-tag
@@ -23,6 +24,7 @@
           :key="tag"
           v-model:checked="selectedTagList[index]"
           @change="doSearch"
+          class="tag-item"
         >
           {{ tag }}
         </a-checkable-tag>
@@ -31,10 +33,11 @@
     <!-- 图片瀑布流 -->
     <div class="waterfall-container" :style="{ columnCount: dynamicColumnCount }">
       <div
-        v-for="picture in dataList"
+        v-for="(picture, index) in dataList"
         :key="picture.id"
-        class="waterfall-item"
+        class="waterfall-item card-hover"
         @click="doClickPicture(picture)"
+        :class="`fade-in-delay-${(index % 5) + 1}`"
       >
         <div class="image-container">
           <img
@@ -47,10 +50,10 @@
         <div class="image-info">
           <h3>{{ picture.name }}</h3>
           <div class="tags">
-            <a-tag color="green">
+            <a-tag color="green" class="tag">
               {{ picture.category ?? '默认' }}
             </a-tag>
-            <a-tag v-for="tag in picture.tags" :key="tag">
+            <a-tag v-for="tag in picture.tags" :key="tag" class="tag">
               {{ tag }}
             </a-tag>
           </div>
@@ -58,18 +61,20 @@
       </div>
     </div>
     <!-- 分页 -->
-    <div class="pagination-container">
+    <div class="pagination-container fade-in">
       <a-pagination
         v-model:current="searchParams.current"
         v-model:pageSize="searchParams.pageSize"
         :total="total"
         @change="onPageChange"
         @showSizeChange="onShowSizeChange"
+        show-size-changer
+        :page-size-options="['10', '20', '50', '100']"
       />
     </div>
     <!-- 加载状态 -->
     <div v-if="loading" class="loading-container">
-      <a-spin size="large" />
+      <a-spin size="large" class="rotate" />
     </div>
   </div>
 </template>
@@ -150,6 +155,7 @@ const getTagCategoryOptions = async () => {
   if (res.data.code === 0 && res.data.data) {
     tagList.value = res.data.data.tagList ?? []
     categoryList.value = res.data.data.categoryList ?? []
+    selectedTagList.value = tagList.value.map(() => false)
   } else {
     message.error('获取标签分类列表失败，' + res.data.message)
   }
@@ -173,6 +179,7 @@ const onImageLoad = (event: Event, picture: API.PictureVO) => {
   const img = event.target as HTMLImageElement
   const originalWidth = img.naturalWidth
   const originalHeight = img.naturalHeight
+  const newAspectRatio = originalWidth / originalHeight
 
   // 存储图片尺寸信息
   imageSizes.value.set(picture.id, {
@@ -227,6 +234,7 @@ onMounted(() => {
 <style scoped>
 #homePage {
   margin-bottom: 16px;
+  background: transparent;
 }
 
 #homePage .search-bar {
@@ -234,8 +242,32 @@ onMounted(() => {
   margin: 0 auto 16px;
 }
 
+.search-input {
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.search-input:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 #homePage .tag-bar {
   margin-bottom: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.tag-item {
+  transition: all 0.2s ease;
+}
+
+.tag-item:hover {
+  transform: translateY(-2px);
 }
 
 /* 瀑布流容器 */
@@ -250,18 +282,20 @@ onMounted(() => {
   break-inside: avoid;
   margin-bottom: 16px;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .waterfall-item:hover {
-  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 /* 图片容器 */
 .image-container {
   overflow: hidden;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px 8px 0 0;
 }
 
 /* 瀑布流图片 */
@@ -270,6 +304,11 @@ onMounted(() => {
   height: auto;
   display: block;
   object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.waterfall-item:hover .waterfall-image {
+  transform: scale(1.05);
 }
 
 /* 图片信息 */
@@ -277,7 +316,6 @@ onMounted(() => {
   padding: 12px;
   background-color: #fff;
   border-radius: 0 0 8px 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .image-info h3 {
@@ -286,6 +324,7 @@ onMounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #2c3e50;
 }
 
 .tags {
@@ -294,11 +333,26 @@ onMounted(() => {
   gap: 4px;
 }
 
+.tag {
+  border-radius: 12px;
+  font-size: 12px;
+  padding: 2px 8px;
+  transition: all 0.2s ease;
+}
+
+.tag:hover {
+  transform: scale(1.05);
+}
+
 /* 分页容器 */
 .pagination-container {
   display: flex;
   justify-content: center;
   margin: 24px 0;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
 }
 
 /* 加载状态 */
@@ -331,6 +385,10 @@ onMounted(() => {
 @media (max-width: 576px) {
   .waterfall-container {
     column-count: 1 !important;
+  }
+  
+  .search-input {
+    border-radius: 20px;
   }
 }
 </style>

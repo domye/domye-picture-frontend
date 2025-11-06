@@ -6,6 +6,7 @@
         v-model:selectedKeys="current"
         :items="menuItems"
         @click="doMenuClick"
+        class="side-menu"
       />
     </a-layout-sider>
   </div>
@@ -52,11 +53,12 @@ const menuItems = computed(() => {
     return fixedMenuItems
   }
   // 展示团队空间分组
-  const teamSpaceSubMenus = teamSpaceList.value.map((spaceUser) => {
+  const teamSpaceSubMenus = teamSpaceList.value.map((spaceUser, index) => {
     const space = spaceUser.space
     return {
       key: '/space/' + spaceUser.spaceId,
       label: space?.spaceName,
+      class: `menu-item-${index}`
     }
   })
   const teamSpaceMenuGroup = {
@@ -101,3 +103,62 @@ const doMenuClick = ({ key }: { key: string }) => {
   router.push(key)
 }
 </script>
+
+<style scoped>
+.sider {
+  background: #ffffff !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px 0;
+  margin: 0;
+  transition: all 0.3s ease;
+  height: calc(100vh - 150px); /* 调整高度以适应新的顶栏 */
+  overflow: hidden;
+}
+
+.sider:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.side-menu {
+  border: none !important;
+  background: transparent !important;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.side-menu :deep(.ant-menu-item) {
+  margin: 2px 8px;
+  border-radius: 6px !important;
+  transition: all 0.2s ease;
+}
+
+.side-menu :deep(.ant-menu-item:hover) {
+  background-color: #f0f5ff !important;
+  transform: translateX(5px);
+}
+
+.side-menu :deep(.ant-menu-item-selected) {
+  background-color: #e6f7ff !important;
+  position: relative;
+}
+
+.side-menu :deep(.ant-menu-item-selected)::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 4px;
+  background-color: #748cbc;
+  border-radius: 0 4px 4px 0;
+}
+
+.side-menu :deep(.ant-menu-item-group-title) {
+  font-weight: bold;
+  color: #5a5a5a;
+  padding-left: 24px !important;
+  font-size: 14px;
+}
+</style>

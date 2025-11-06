@@ -1,22 +1,23 @@
 <template>
   <div id="basicLayout">
     <a-layout style="min-height: 100vh">
-      <a-layout-header class="header"><GlobalHeader /></a-layout-header
-      ><a-layout
-        ><a-layout-sider
+      <a-layout-header class="header fade-in"><GlobalHeader /></a-layout-header>
+      <a-layout>
+        <a-layout-sider
           v-if="loginUserStore.loginUser.id"
-          class="sider"
+          class="sider slide-in-left"
           width="180"
           breakpoint="lg"
           collapsed-width="0"
         >
-          <globalSider
-        /></a-layout-sider>
-        <a-layout-content class="content"> <router-view /> </a-layout-content
-      ></a-layout>
-      <a-layout-footer>Footer</a-layout-footer>
+          <globalSider />
+        </a-layout-sider>
+        <a-layout-content class="content fade-in-delay-1"> 
+          <router-view /> 
+        </a-layout-content>
+      </a-layout>
+      <a-layout-footer class="footer fade-in-delay-2"> By Domye </a-layout-footer>
     </a-layout>
-    <a-layout-footer class="footer"> By Domye </a-layout-footer>
   </div>
 </template>
 
@@ -29,51 +30,73 @@ const loginUserStore = useLoginUserStore()
 
 <style scoped>
 #basicLayout .header {
-  padding-inline: 20px;
-  margin-bottom: 16px;
+  padding: 0 20px;
   color: unset;
   background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin: 16px;
+  transition: all 0.3s ease;
+  height: 60px;
+  line-height: 40px;
+  z-index: 100;
+  position: relative;
+}
+
+#basicLayout .header:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 #basicLayout .footer {
-  background: #ffffff; /* 改变背景颜色 */
-  padding: 20px 16px; /* 增加内边距 */
+  background: #ffffff;
+  padding: 20px 16px;
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   text-align: center;
-  font-size: 14px; /* 字体大小 */
-  color: #666; /* 字体颜色 */
-  z-index: 1000; /* 确保在其他内容之上 */
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* 添加阴影 */
-  border-radius: 10px 10px 0 0; /* 添加圆角 */
+  font-size: 14px;
+  color: #666;
+  z-index: 1000;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 10px 10px 0 0;
 }
 
 #basicLayout .content {
-  padding: 30px;
+  padding: 20px;
   margin-bottom: 28px;
   overflow: initial;
-  background: #fff;
+  background: transparent;
+  border-radius: 8px;
+  margin: 0 16px 56px 16px;
+  transition: all 0.3s ease;
+  margin-left: 32px; /* 保持增加的距离 */
 }
 
-#basicLayout .header {
-  margin-bottom: 1px;
-}
-
-#basicLayout .content {
-  padding: 28px;
+#basicLayout .content:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 #basicLayout .sider {
-  background: #fff;
-  /* padding-top: 20px; */
-  /* border-right: 0.5px solid #eee; */
-  margin-bottom: 28px;
+  background: transparent;
+  margin-bottom: 0;
+  margin-left: 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  height: fit-content;
+  padding: 0;
+}
+
+#basicLayout :deep(.ant-layout-sider-zero-width-trigger) {
+  top: 60px;
+  right: 10px;
+  background: #748CBC;
+  border-radius: 4px;
 }
 
 #basicLayout :deep(.ant-menu-root) {
   border-bottom: none !important;
   border-inline-end: none !important;
+  border-radius: 8px !important;
 }
 </style>
