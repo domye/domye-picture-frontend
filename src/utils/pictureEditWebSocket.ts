@@ -1,52 +1,100 @@
+import { getWsBaseUrl } from '@/config/env'
+import { wsLogger } from './logger'
+
+/**
+ * WebSocket 消息类型
+ */
+export type WsMessage = {
+  type: string
+  data?: unknown
+}
+
+/**
+ * 事件处理器类型
+ */
+export type EventHandler<T = unknown> = (data?: T) => void
+
+/**
+ * 事件处理器映射
+ */
+type EventHandlerMap = Record<string, EventHandler<unknown>[]>
+
+/**
+ * WebSocket 连接状态
+ */
+enum ConnectionState {
+  DISCONNECTED = 'DISCONNECTED',
+  CONNECTING = 'CONNECTING',
+  CONNECTED = 'CONNECTED',
+  CLOSING = 'CLOSING',
+}
+
+/**
+ * 图片编辑 WebSocket 管理
+ * 遵循单一职责原则 - 专注于 WebSocket 连接和事件管理
+ */
 export default class PictureEditWebSocket {
-  private pictureId: number
+  private readonly pictureId: number
   private socket: WebSocket | null
-  private eventHandlers: any
+  private eventHandlers: EventHandlerMap
+  private state: ConnectionState
 
   constructor(pictureId: number) {
-    this.pictureId = pictureId // 当前编辑的图片 ID
-    this.socket = null // WebSocket 实例
-    this.eventHandlers = {} // 自定义事件处理器
+    this.pictureId = pictureId
+    this.socket = null
+    this.eventHandlers = {}
+    this.state = ConnectionState.DISCONNECTED
   }
 
   /**
    * 初始化 WebSocket 连接
    */
-  connect() {
-    const DEV_BASE_URL = 'wss://localhost:8123'
-    // 线上地址
-    const PROD_BASE_URL = 'wss://picture.domye.top'
-    const url = `${DEV_BASE_URL}/api/ws/picture/edit?pictureId=${this.pictureId}`
-    this.socket = new WebSocket(url)
+  connect(): void {
+    if (this.socket) {
+      wsLogger.warn('WebSocket 已存在连接')
+      return
+    }
 
-    // 设置携带 cookie
+    this.state = ConnectionState.CONNECTING
+    const url = `${getWsBaseUrl()}/api/ws/picture/edit?pictureId=${this.pictureId}`
+    this.socket = new WebSocket(url)
     this.socket.binaryType = 'blob'
 
-    // 监听连接成功事件
+    this.setupEventListeners()
+  }
+
+  /**
+   * 设置 WebSocket 事件监听器
+   * 遵循单一职责原则 - 事件监听器逻辑集中管理
+   */
+  private setupEventListeners(): void {
+    if (!this.socket) return
+
     this.socket.onopen = () => {
-      console.log('WebSocket 连接已建立')
+      this.state = ConnectionState.CONNECTED
+      wsLogger.connected(this.socket!.url)
       this.triggerEvent('open')
     }
 
-    // 监听消息事件
     this.socket.onmessage = (event) => {
-      const message = JSON.parse(event.data)
-      console.log('收到消息:', message)
-
-      // 根据消息类型触发对应事件
-      const type = message.type
-      this.triggerEvent(type, message)
+      try {
+        const message: WsMessage = JSON.parse(event.data)
+        wsLogger.message(message)
+        this.triggerEvent(message.type, message.data)
+      } catch (error) {
+        wsLogger.error('解析消息失败', error)
+      }
     }
 
-    // 监听连接关闭事件
     this.socket.onclose = (event) => {
-      console.log('WebSocket 连接已关闭:', event)
+      this.state = ConnectionState.DISCONNECTED
+      wsLogger.closed(event)
       this.triggerEvent('close', event)
+      this.socket = null
     }
 
-    // 监听错误事件
     this.socket.onerror = (error) => {
-      console.error('WebSocket 发生错误:', error)
+      wsLogger.error(error)
       this.triggerEvent('error', error)
     }
   }
@@ -54,47 +102,69 @@ export default class PictureEditWebSocket {
   /**
    * 关闭 WebSocket 连接
    */
-  disconnect() {
+  disconnect(): void {
     if (this.socket) {
+      this.state = ConnectionState.CLOSING
       this.socket.close()
-      console.log('WebSocket 连接已手动关闭')
+      wsLogger.log('WebSocket 连接已手动关闭')
     }
   }
 
   /**
-   * 发送消息到后端
-   * @param {Object} message 消息对象
+   * 获取当前连接状态
    */
-  sendMessage(message: object) {
+  getState(): ConnectionState {
+    return this.state
+  }
+
+  /**
+   * 发送消息到后端
+   * @param message 消息对象
+   */
+  sendMessage(message: Record<string, unknown>): void {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify(message))
-      console.log('消息已发送:', message)
+      const data = JSON.stringify(message)
+      this.socket.send(data)
+      wsLogger.sent(message)
     } else {
-      console.error('WebSocket 未连接，无法发送消息:', message)
+      wsLogger.notReady()
     }
   }
 
   /**
    * 添加自定义事件监听
-   * @param {string} type 消息类型
-   * @param {Function} handler 消息处理函数
+   * @param type 事件类型
+   * @param handler 事件处理函数
    */
-  on(type: string, handler: (data?: any) => void) {
+  on<T = unknown>(type: string, handler: EventHandler<T>): void {
     if (!this.eventHandlers[type]) {
       this.eventHandlers[type] = []
     }
-    this.eventHandlers[type].push(handler)
+    // 将泛型处理器转换为非泛型处理器存储
+    this.eventHandlers[type].push(handler as EventHandler<unknown>)
+  }
+
+  /**
+   * 移除事件监听
+   * @param type 事件类型
+   * @param handler 事件处理函数
+   */
+  off<T = unknown>(type: string, handler: EventHandler<T>): void {
+    const handlers = this.eventHandlers[type]
+    if (handlers) {
+      this.eventHandlers[type] = handlers.filter((h) => h !== (handler as EventHandler<unknown>))
+    }
   }
 
   /**
    * 触发事件
-   * @param {string} type 消息类型
-   * @param {Object} data 消息数据
+   * @param type 事件类型
+   * @param data 事件数据
    */
-  triggerEvent(type: string, data?: any) {
+  private triggerEvent<T = unknown>(type: string, data?: T): void {
     const handlers = this.eventHandlers[type]
     if (handlers) {
-      handlers.forEach((handler: any) => handler(data))
+      handlers.forEach((handler: EventHandler<unknown>) => handler(data))
     }
   }
 }
