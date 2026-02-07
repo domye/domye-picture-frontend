@@ -89,8 +89,9 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  replySuccess: []
   deleteSuccess: []
+  replySuccess: []
+  replySuccessFromList: []
 }>()
 
 // 回复列表
@@ -192,6 +193,7 @@ const handleSubmitReply = async (reply: API.CommentReplyVO) => {
       showReplyInputFor.value = null
       await fetchReplyList(1, false)
       emit('replySuccess')
+      emit('replySuccessFromList')
     } else {
       message.error('回复失败：' + res.data.message)
     }
@@ -279,6 +281,11 @@ watch(
   },
   { immediate: true },
 )
+
+// 暴露刷新方法给父组件
+defineExpose({
+  refresh: () => fetchReplyList(1, false),
+})
 
 onMounted(() => {
   if (props.commentId && props.pictureId) {

@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { addCommentUsingPost, listTopCommentsUsingGet } from '@/api/commentController'
 import type { API } from '@/api/typings'
@@ -191,14 +191,17 @@ const loadMoreComments = () => {
 
 // 回复成功回调
 const handleReplySuccess = () => {
-  // 刷新评论列表
-  fetchCommentList(1, false)
+  // 不再刷新整个评论列表，通过 commentUpdated 事件局部更新
 }
 
 // 删除成功回调
 const handleDeleteSuccess = () => {
-  // 刷新评论列表
-  fetchCommentList(1, false)
+  // 如果当前页只有1条数据且不是第一页，则回到上一页
+  let pageToLoad = current.value
+  if (commentList.value.length === 1 && current.value > 1) {
+    pageToLoad = current.value - 1
+  }
+  fetchCommentList(pageToLoad, false)
 }
 
 // 评论更新回调（用于更新回复数和回复预览列表）

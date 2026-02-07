@@ -82,11 +82,12 @@
 
       <!-- 完整回复列表 -->
       <CommentReplyList
+        ref="replyListRef"
         v-if="showReplies"
         :comment-id="comment.commentId"
         :picture-id="pictureId"
-        @reply-success="handleReplySuccess"
         @delete-success="handleDeleteSuccess"
+        @reply-success-from-list="handleReplySuccessFromList"
       />
     </div>
   </div>
@@ -129,6 +130,8 @@ const showReplies = ref(false)
 const submitting = ref(false)
 // 加载回复列表状态
 const loadingReplies = ref(false)
+// 回复列表组件引用
+const replyListRef = ref<InstanceType<typeof CommentReplyList> | null>(null)
 
 // 是否显示回复切换按钮
 const showReplyToggle = computed(() => {
@@ -222,7 +225,7 @@ const loadReplyPreviews = async () => {
         emit('commentUpdated', updatedComment)
       }
     }
-  } catch (e: any) {
+  } catch {
   } finally {
     loadingReplies.value = false
   }
@@ -259,7 +262,10 @@ const handleSubmitReply = async () => {
       replyContent.value = ''
       showReplyInput.value = false
       await loadReplyPreviews()
-      emit('replySuccess')
+      // 刷新回复列表组件
+      if (replyListRef.value) {
+        await replyListRef.value.refresh()
+      }
     } else {
       message.error('回复失败：' + res.data.message)
     }
@@ -281,8 +287,9 @@ const toggleReplyList = () => {
   showReplies.value = !showReplies.value
 }
 
-// 回复成功回调
-const handleReplySuccess = () => {
+// 回复成功回调（从回复列表来的）
+const handleReplySuccessFromList = async () => {
+  await loadReplyPreviews()
   emit('replySuccess')
 }
 
