@@ -121,7 +121,7 @@
     <a-row :gutter="[16, 16]" style="margin-top: 24px">
       <a-col :span="24">
         <a-card title="评论区" :bordered="false">
-          <CommentList :picture-id="Number(props.id)" />
+          <CommentList :picture-id="props.id" />
         </a-card>
       </a-col>
     </a-row>

@@ -2,11 +2,7 @@
   <div class="reply-list-container">
     <a-spin :spinning="loading">
       <div v-if="replyList.length > 0" class="reply-list">
-        <div
-          v-for="reply in replyList"
-          :key="reply.commentId"
-          class="reply-item"
-        >
+        <div v-for="reply in replyList" :key="reply.commentId" class="reply-item">
           <a-avatar :src="reply.userAvatar" :alt="String(reply.userName || '用户')" :size="28">
             {{ (reply.userName || '用户').toString().charAt(0) }}
           </a-avatar>
@@ -20,11 +16,7 @@
             </div>
             <div class="reply-text">{{ reply.content }}</div>
             <div class="reply-actions">
-              <a-button
-                type="text"
-                size="small"
-                @click="handleReply(reply)"
-              >
+              <a-button type="text" size="small" @click="handleReply(reply)">
                 <template #icon>
                   <MessageOutlined />
                 </template>
@@ -51,12 +43,7 @@
                     >
                       发送
                     </a-button>
-                    <a-button
-                      size="small"
-                      @click="cancelReply"
-                    >
-                      取消
-                    </a-button>
+                    <a-button size="small" @click="cancelReply"> 取消 </a-button>
                   </a-space>
                 </template>
               </a-input>
@@ -67,7 +54,7 @@
 
       <a-empty v-else-if="!loading" description="暂无回复" :image="null">
         <template #description>
-          <span style="color: #999; font-size: 14px;">暂无回复</span>
+          <span style="color: #999; font-size: 14px">暂无回复</span>
         </template>
       </a-empty>
 
@@ -95,8 +82,8 @@ dayjs.extend(relativeTime)
 dayjs.locale('zh-cn')
 
 interface Props {
-  commentId: number
-  pictureId: number
+  commentId: number | string
+  pictureId: number | string
 }
 
 const props = defineProps<Props>()
@@ -114,7 +101,7 @@ const loading = ref(false)
 const loadingMore = ref(false)
 // 分页信息
 const current = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(5)
 const total = ref(0)
 const hasMore = ref(false)
 
@@ -144,6 +131,7 @@ const fetchReplyList = async (page: number = 1, append: boolean = false) => {
     if (res.data.code === 0 && res.data.data) {
       // 根评论的回复都在 replyPreviewList 中
       const rootComment = res.data.data.records?.[0]
+
       if (rootComment?.replyPreviewList) {
         if (append) {
           replyList.value = [...replyList.value, ...rootComment.replyPreviewList]
@@ -154,9 +142,6 @@ const fetchReplyList = async (page: number = 1, append: boolean = false) => {
         total.value = rootComment.replyCount || 0
         current.value = page
         hasMore.value = replyList.value.length < total.value
-
-        // 调试日志
-        console.log('回复列表数据:', replyList.value)
       }
     } else {
       message.error('获取回复列表失败：' + res.data.message)
@@ -205,6 +190,7 @@ const handleSubmitReply = async (reply: API.CommentReplyVO) => {
       message.success('回复成功')
       replyContent.value = ''
       showReplyInputFor.value = null
+      await fetchReplyList(1, false)
       emit('replySuccess')
     } else {
       message.error('回复失败：' + res.data.message)
@@ -249,27 +235,14 @@ const formatTime = (time?: string) => {
 const shouldShowParent = (reply: API.CommentReplyVO) => {
   // 如果没有 parentId，不显示
   if (!reply.parentId) {
-    console.log('展开：不显示 parentId 为空:', reply)
     return false
   }
 
   // 如果 parentId === commentId，说明是直接回复根评论（二级回复），不显示
-  if (reply.parentId === props.commentId) {
-    console.log('展开：不显示，二级回复 parentId === commentId:', {
-      replyParentId: reply.parentId,
-      commentId: props.commentId,
-      reply
-    })
+  // 注意：commentId 和 parentId 可能都是字符串类型，需要转成相同类型比较
+  if (String(reply.parentId) === String(props.commentId)) {
     return false
   }
-
-  // 否则是三级及以上回复，显示
-  console.log('展开：显示，三级及以上回复:', {
-    replyParentId: reply.parentId,
-    commentId: props.commentId,
-    parentUserName: reply.parentUserName,
-    reply
-  })
   return true
 }
 
@@ -287,11 +260,10 @@ const getParentUserName = (reply: API.CommentReplyVO): string => {
     return '未知用户'
   }
 
-  const parentReply = replyList.value.find(r => r.commentId === reply.parentId)
-  if (parentReply && parentReply.userName) {
-    return parentReply.userName
+  const parentReply = replyList.value.find((r) => String(r.commentId) === String(reply.parentId))
+  if (parentReply) {
+    return parentReply.userName || '未知用户'
   }
-
   return '未知用户'
 }
 
@@ -305,7 +277,7 @@ watch(
       fetchReplyList(1, false)
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 onMounted(() => {

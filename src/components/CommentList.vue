@@ -32,20 +32,16 @@
             :picture-id="pictureId"
             @reply-success="handleReplySuccess"
             @delete-success="handleDeleteSuccess"
+            @comment-updated="handleCommentUpdated"
           />
         </div>
 
         <!-- 空状态 -->
-        <a-empty
-          v-else-if="!loading"
-          description="暂无评论，快来抢沙发吧~"
-        />
+        <a-empty v-else-if="!loading" description="暂无评论，快来抢沙发吧~" />
 
         <!-- 加载更多 -->
         <div v-if="hasMore" class="load-more-container">
-          <a-button :loading="loadingMore" @click="loadMoreComments">
-            加载更多评论
-          </a-button>
+          <a-button :loading="loadingMore" @click="loadMoreComments"> 加载更多评论 </a-button>
         </div>
       </a-spin>
     </div>
@@ -60,7 +56,7 @@ import type { API } from '@/api/typings'
 import CommentItem from './CommentItem.vue'
 
 interface Props {
-  pictureId: number
+  pictureId: number | string
 }
 
 const props = defineProps<Props>()
@@ -97,19 +93,19 @@ const fetchCommentList = async (page: number = 1, append: boolean = false) => {
       pageSize: pageSize.value,
       previewSize: 5,
     })
-
     if (res.data.code === 0 && res.data.data) {
       const { records, total: totalCount, current: currentPage } = res.data.data
-
+      // 确保 records 是数组
+      const newRecords = Array.isArray(records) ? records : []
       if (append) {
-        commentList.value = [...commentList.value, ...records]
+        commentList.value = [...commentList.value, ...newRecords]
       } else {
-        commentList.value = records
+        commentList.value = newRecords
       }
 
-      total.value = totalCount
-      current.value = currentPage
-      hasMore.value = commentList.value.length < totalCount
+      total.value = Number(totalCount)
+      current.value = Number(currentPage)
+      hasMore.value = commentList.value.length < Number(totalCount)
     } else {
       message.error('获取评论列表失败：' + res.data.message)
     }
@@ -143,9 +139,28 @@ const handleSubmitComment = async () => {
 
     if (res.data.code === 0) {
       message.success('发表成功')
-      commentContent.value = ''
-      // 刷新评论列表
+
+      const newCommentId = res.data.data
+
       await fetchCommentList(1, false)
+
+      // 乐观更新（如果刷新后还是没有显示）
+      if (commentList.value.length === 0) {
+        const currentUser = getCurrentUser()
+        const tempComment: API.CommentListVO = {
+          commentId: newCommentId,
+          userId: currentUser?.id || 0,
+          userName: currentUser?.userName || '我',
+          userAvatar: currentUser?.userAvatar || '',
+          content: content,
+          replyCount: 0,
+          createTime: new Date().toISOString(),
+          replyPreviewList: [],
+        }
+        commentList.value.unshift(tempComment)
+      }
+
+      commentContent.value = ''
     } else {
       message.error('发表失败：' + res.data.message)
     }
@@ -154,6 +169,19 @@ const handleSubmitComment = async () => {
   } finally {
     submitting.value = false
   }
+}
+
+// 获取当前用户信息
+const getCurrentUser = () => {
+  try {
+    const userStr = localStorage.getItem('loginUser')
+    if (userStr) {
+      return JSON.parse(userStr)
+    }
+  } catch (e) {
+    console.error('获取用户信息失败:', e)
+  }
+  return null
 }
 
 // 加载更多评论
@@ -173,6 +201,16 @@ const handleDeleteSuccess = () => {
   fetchCommentList(1, false)
 }
 
+// 评论更新回调（用于更新回复数和回复预览列表）
+const handleCommentUpdated = (updatedComment: API.CommentListVO) => {
+  const index = commentList.value.findIndex(
+    (comment) => comment.commentId === updatedComment.commentId,
+  )
+  if (index !== -1) {
+    commentList.value[index] = updatedComment
+  }
+}
+
 // 监听 pictureId 变化
 watch(
   () => props.pictureId,
@@ -183,14 +221,10 @@ watch(
       fetchCommentList(1, false)
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
-onMounted(() => {
-  if (props.pictureId) {
-    fetchCommentList(1, false)
-  }
-})
+// onMounted 不再需要，因为 watch 已经设置了 immediate: true
 </script>
 
 <style scoped>

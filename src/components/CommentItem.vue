@@ -93,9 +93,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { message } from 'ant-design-vue'
-import { addCommentUsingPost } from '@/api/commentController'
+import { addCommentUsingPost, listReplyCommentsUsingGet } from '@/api/commentController'
 import type { API } from '@/api/typings'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -108,7 +108,7 @@ dayjs.locale('zh-cn')
 
 interface Props {
   comment: API.CommentListVO
-  pictureId: number
+  pictureId: number | string
 }
 
 const props = defineProps<Props>()
@@ -116,6 +116,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   replySuccess: []
   deleteSuccess: []
+  commentUpdated: [API.CommentListVO]
 }>()
 
 // 回复内容
@@ -126,21 +127,13 @@ const showReplyInput = ref(false)
 const showReplies = ref(false)
 // 提交状态
 const submitting = ref(false)
+// 加载回复列表状态
+const loadingReplies = ref(false)
 
 // 是否显示回复切换按钮
 const showReplyToggle = computed(() => {
   return props.comment.replyCount && props.comment.replyCount > 0
 })
-
-// 监听评论变化，输出调试信息
-watch(
-  () => props.comment,
-  (newComment) => {
-    console.log('评论数据:', newComment)
-    console.log('回复预览列表:', newComment.replyPreviewList)
-  },
-  { immediate: true }
-)
 
 // 格式化时间
 const formatTime = (time?: string) => {
@@ -164,27 +157,14 @@ const formatTime = (time?: string) => {
 const shouldShowParent = (reply: API.CommentReplyVO) => {
   // 如果没有 parentId，不显示
   if (!reply.parentId) {
-    console.log('预览：不显示 parentId 为空:', reply)
     return false
   }
 
   // 如果 parentId === comment.commentId，说明是直接回复根评论（二级回复），不显示
-  if (reply.parentId === props.comment.commentId) {
-    console.log('预览：不显示，二级回复 parentId === commentId:', {
-      replyParentId: reply.parentId,
-      commentId: props.comment.commentId,
-      reply
-    })
+  // 注意：commentId 和 parentId 可能都是字符串类型，需要转成相同类型比较
+  if (String(reply.parentId) === String(props.comment.commentId)) {
     return false
   }
-
-  // 否则是三级及以上回复，显示
-  console.log('预览：显示，三级及以上回复:', {
-    replyParentId: reply.parentId,
-    commentId: props.comment.commentId,
-    parentUserName: reply.parentUserName,
-    reply
-  })
   return true
 }
 
@@ -202,11 +182,12 @@ const getParentUserName = (reply: API.CommentReplyVO): string => {
     return '未知用户'
   }
 
-  const parentReply = props.comment.replyPreviewList?.find(r => r.commentId === reply.parentId)
-  if (parentReply && parentReply.userName) {
-    return parentReply.userName
+  const parentReply = props.comment.replyPreviewList?.find(
+    (r) => String(r.commentId) === String(reply.parentId),
+  )
+  if (parentReply) {
+    return parentReply.userName || '未知用户'
   }
-
   return '未知用户'
 }
 
@@ -215,6 +196,36 @@ const handleReply = () => {
   showReplyInput.value = true
   showReplies.value = true
   replyContent.value = ''
+}
+
+// 加载回复预览列表
+const loadReplyPreviews = async () => {
+  if (!props.pictureId || !props.comment.commentId) return
+
+  try {
+    loadingReplies.value = true
+    const res = await listReplyCommentsUsingGet({
+      pictureId: props.pictureId,
+      commentId: props.comment.commentId,
+      current: 1,
+      pageSize: 5,
+    })
+
+    if (res.data.code === 0 && res.data.data) {
+      const rootComment = res.data.data.records?.[0]
+      if (rootComment) {
+        const updatedComment = {
+          ...props.comment,
+          replyCount: rootComment.replyCount || 0,
+          replyPreviewList: rootComment.replyPreviewList || [],
+        }
+        emit('commentUpdated', updatedComment)
+      }
+    }
+  } catch (e: any) {
+  } finally {
+    loadingReplies.value = false
+  }
 }
 
 // 提交回复
@@ -247,6 +258,7 @@ const handleSubmitReply = async () => {
       message.success('回复成功')
       replyContent.value = ''
       showReplyInput.value = false
+      await loadReplyPreviews()
       emit('replySuccess')
     } else {
       message.error('回复失败：' + res.data.message)
