@@ -116,6 +116,15 @@
         </a-card>
       </a-col>
     </a-row>
+
+    <!-- 评论区域 -->
+    <a-row :gutter="[16, 16]" style="margin-top: 24px">
+      <a-col :span="24">
+        <a-card title="评论区" :bordered="false">
+          <CommentList :picture-id="Number(props.id)" />
+        </a-card>
+      </a-col>
+    </a-row>
   </div>
 </template>
 
@@ -127,6 +136,7 @@ import type { API } from '@/api/typings'
 import dayjs from 'dayjs'
 import router from '@/router'
 import { SPACE_PERMISSION_ENUM } from '@/constants/space'
+import CommentList from '@/components/CommentList.vue'
 
 const doEdit = () => {
   router.push('/add_picture?id=' + picture.value.id)

@@ -17,6 +17,21 @@ export async function addVoteActivitiesUsingPost(
   })
 }
 
+/** 删除投票 POST /api/vote/activity/delete */
+export async function deleteVoteActivitiesUsingPost(
+  body: API.VoteActivityDeleteRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseString_>('/api/vote/activity/delete', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
 /** 获取投票活动详情 GET /api/vote/activity/detail/${param0} */
 export async function getVoteActivitiesUsingGet(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)

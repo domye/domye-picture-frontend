@@ -2,6 +2,7 @@
 /* eslint-disable */
 // API 更新时间：
 // API 唯一标识：
+import * as commentController from './commentController'
 import * as filterListController from './filterListController'
 import * as pictureController from './pictureController'
 import * as rankController from './rankController'
@@ -10,9 +11,8 @@ import * as spaceAnalyzeController from './spaceAnalyzeController'
 import * as spaceUserController from './spaceUserController'
 import * as userController from './userController'
 import * as voteController from './voteController'
-import * as wxMessageController from './wxMessageController'
-import * as wxQrCodeController from './wxQrCodeController'
 export default {
+  commentController,
   filterListController,
   pictureController,
   rankController,
@@ -21,6 +21,4 @@ export default {
   spaceUserController,
   userController,
   voteController,
-  wxMessageController,
-  wxQrCodeController,
 }

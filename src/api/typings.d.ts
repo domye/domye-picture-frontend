@@ -83,6 +83,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponsePageCommentListVO_ = {
+    code?: number
+    data?: PageCommentListVO_
+    message?: string
+  }
+
   type BaseResponsePagePicture_ = {
     code?: number
     data?: PagePicture_
@@ -143,18 +149,6 @@ declare namespace API {
     message?: string
   }
 
-  type BaseResponseQrcodeStatusVO_ = {
-    code?: number
-    data?: QrcodeStatusVO
-    message?: string
-  }
-
-  type BaseResponseQrcodeVO_ = {
-    code?: number
-    data?: QrcodeVO
-    message?: string
-  }
-
   type BaseResponseSpace_ = {
     code?: number
     data?: Space
@@ -203,17 +197,32 @@ declare namespace API {
     message?: string
   }
 
-  type BaseWxMsgResVo = {
+  type CommentAddRequest = {
     content?: string
-    createTime?: number
-    fromUserName?: string
-    msgType?: string
-    toUserName?: string
+    parentid?: number
+    pictureid?: number
   }
 
-  type checkQrStatusUsingGETParams = {
-    /** sceneId */
-    sceneId: number
+  type CommentListVO = {
+    commentId?: number
+    content?: string
+    createTime?: string
+    replyCount?: number
+    replyPreviewList?: CommentReplyVO[]
+    userAvatar?: string
+    userId?: number
+    userName?: string
+  }
+
+  type CommentReplyVO = {
+    commentId?: number
+    content?: string
+    createTime?: string
+    parentId?: number
+    parentUserName?: string
+    userAvatar?: string
+    userId?: number
+    userName?: string
   }
 
   type DeleteRequest = {
@@ -272,6 +281,24 @@ declare namespace API {
     id: number
   }
 
+  type listReplyCommentsUsingGETParams = {
+    commentId?: number
+    current?: number
+    pageSize?: number
+    pictureId?: number
+    sortField?: string
+    sortOrder?: string
+  }
+
+  type listTopCommentsUsingGETParams = {
+    current?: number
+    pageSize?: number
+    pictureId?: number
+    previewSize?: number
+    sortField?: string
+    sortOrder?: string
+  }
+
   type LoginUserVO = {
     createTime?: string
     editTime?: string
@@ -282,6 +309,14 @@ declare namespace API {
     userName?: string
     userProfile?: string
     userRole?: string
+  }
+
+  type PageCommentListVO_ = {
+    current?: number
+    pages?: number
+    records?: CommentListVO[]
+    size?: number
+    total?: number
   }
 
   type PagePicture_ = {
@@ -440,27 +475,6 @@ declare namespace API {
     url?: string
     user?: UserVO
     userId?: number
-  }
-
-  type QrcodeStatusVO = {
-    code?: string
-    message?: string
-    openId?: string
-    sceneId?: number
-    status?: string
-  }
-
-  type QrcodeVO = {
-    code?: string
-    sceneId?: number
-    ticket?: string
-    url?: string
-  }
-
-  type receiveMessageUsingPOSTParams = {
-    nonce?: string
-    signature?: string
-    timestamp?: string
   }
 
   type SearchPictureByColorRequest = {
@@ -705,13 +719,6 @@ declare namespace API {
     userRole?: string
   }
 
-  type verifyUsingGETParams = {
-    echostr?: string
-    nonce?: string
-    signature?: string
-    timestamp?: string
-  }
-
   type VoteActivity = {
     createTime?: string
     createUser?: number
@@ -733,6 +740,10 @@ declare namespace API {
     options?: VoteOptionAddRequest[]
     startTime?: string
     title?: string
+  }
+
+  type VoteActivityDeleteRequest = {
+    activityId?: number
   }
 
   type VoteActivityDetailVO = {
