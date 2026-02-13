@@ -26,8 +26,8 @@
 
 <script setup lang="ts">
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
-import GlobalHeader from '../components/GlobalHeader.vue'
-import globalSider from '../components/GlobalSider.vue'
+import GlobalHeader from '@/components/layout/GlobalHeader.vue'
+import globalSider from '@/components/layout/GlobalSider.vue'
 const loginUserStore = useLoginUserStore()
 </script>
 

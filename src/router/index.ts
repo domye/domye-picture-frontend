@@ -21,8 +21,8 @@ import PictureDetailPage from '@/pages/picture/PictureDetailPage.vue'
 // 管理员相关页面
 import UserManagePage from '@/pages/admin/UserManagePage.vue'
 import PictureManagePage from '@/pages/admin/PictureManagePage.vue'
-import SpaceManagePage from '@/pages/admin/spaceManage.vue'
-import SpaceUserManage from '@/pages/admin/spaceUserManage.vue'
+import SpaceManagePage from '@/pages/admin/SpaceManagePage.vue'
+import SpaceUserManagePage from '@/pages/admin/SpaceUserManagePage.vue'
 import VoteManagePage from '@/pages/admin/VoteManagePage.vue'
 import AddVoteActivityPage from '@/pages/vote/AddVoteActivityPage.vue'
 import VotePage from '@/pages/vote/VotePage.vue'
@@ -133,7 +133,7 @@ const router = createRouter({
     {
       path: '/spaceUserManage/:id',
       name: '空间成员管理',
-      component: SpaceUserManage,
+      component: SpaceUserManagePage,
       props: true,
     },
   ],

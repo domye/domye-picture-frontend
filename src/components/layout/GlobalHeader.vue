@@ -70,7 +70,7 @@ import { computed, h, ref } from 'vue'
 import { HomeOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons-vue'
 import { message, type MenuProps } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
-import { useLoginUserStore } from '../stores/useLoginUserStore'
+import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { userLogoutUsingPost } from '@/api/userController'
 
 // 初始化用户登录状态 store

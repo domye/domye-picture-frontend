@@ -54,6 +54,9 @@ import { message } from 'ant-design-vue'
 import { addCommentUsingPost, listTopCommentsUsingGet } from '@/api/commentController'
 import type { API } from '@/api/typings'
 import CommentItem from './CommentItem.vue'
+import { useLoginUserStore } from '@/stores/useLoginUserStore'
+
+const loginUserStore = useLoginUserStore()
 
 interface Props {
   pictureId: number | string
@@ -146,7 +149,7 @@ const handleSubmitComment = async () => {
 
       // 乐观更新（如果刷新后还是没有显示）
       if (commentList.value.length === 0) {
-        const currentUser = getCurrentUser()
+        const currentUser = loginUserStore.loginUser
         const tempComment: API.CommentListVO = {
           commentId: newCommentId,
           userId: currentUser?.id || 0,
@@ -169,19 +172,6 @@ const handleSubmitComment = async () => {
   } finally {
     submitting.value = false
   }
-}
-
-// 获取当前用户信息
-const getCurrentUser = () => {
-  try {
-    const userStr = localStorage.getItem('loginUser')
-    if (userStr) {
-      return JSON.parse(userStr)
-    }
-  } catch (e) {
-    console.error('获取用户信息失败:', e)
-  }
-  return null
 }
 
 // 加载更多评论

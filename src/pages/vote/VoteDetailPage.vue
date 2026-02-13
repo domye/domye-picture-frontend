@@ -63,8 +63,8 @@ import {
   endVoteActivitiesUsingPost,
 } from '@/api/voteController'
 import type { API } from '@/api/typings'
-import dayjs from 'dayjs'
 import router from '@/router'
+import { formatDate } from '@/utils'
 
 const props = defineProps<{
   id: string | number
@@ -147,12 +147,6 @@ const doEnd = async () => {
 // 删除活动
 const doDelete = async () => {
   // TODO: 实现删除功能
-}
-
-// 格式化日期
-const formatDate = (date?: string): string => {
-  if (!date) return '-'
-  return dayjs(date).format('YYYY-MM-DD HH:mm')
 }
 
 // 监听ID变化

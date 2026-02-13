@@ -74,7 +74,7 @@
             </a-descriptions-item>
 
             <a-descriptions-item label="大小">
-              {{ formatFileSize(picture.picSize) }}
+              {{ formatSize(picture.picSize) }}
             </a-descriptions-item>
 
             <a-descriptions-item label="上传时间">
@@ -133,10 +133,10 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { deletePictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController'
 import type { API } from '@/api/typings'
-import dayjs from 'dayjs'
 import router from '@/router'
 import { SPACE_PERMISSION_ENUM } from '@/constants/space'
-import CommentList from '@/components/CommentList.vue'
+import CommentList from '@/components/comment/CommentList.vue'
+import { formatSize, formatDate, toHexColor } from '@/utils'
 
 const doEdit = () => {
   router.push('/add_picture?id=' + picture.value.id)
@@ -166,16 +166,6 @@ const imageMaxHeight = computed(() => {
   return window.innerHeight > 800 ? '600px' : '400px'
 })
 
-function toHexColor(input) {
-  // 去掉 0x 前缀
-  const colorValue = input.startsWith('0x') ? input.slice(2) : input
-
-  // 将剩余部分解析为十六进制数，再转成 6 位十六进制字符串
-  const hexColor = parseInt(colorValue, 16).toString(16).padStart(6, '0')
-
-  // 返回标准 #RRGGBB 格式
-  return `#${hexColor}`
-}
 // 获取图片详情
 const fetchPictureDetail = async () => {
   if (!props.id) return
@@ -206,27 +196,6 @@ function createPermissionChecker(permission: string) {
 // 定义权限检查
 const canEdit = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
 const canDelete = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
-// 格式化文件大小
-const formatFileSize = (bytes?: number): string => {
-  if (!bytes) return '-'
-
-  const units = ['B', 'KB', 'MB', 'GB', 'TB']
-  let size = bytes
-  let unitIndex = 0
-
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024
-    unitIndex++
-  }
-
-  return `${size.toFixed(2)} ${units[unitIndex]}`
-}
-
-// 格式化日期
-const formatDate = (date?: string): string => {
-  if (!date) return '-'
-  return dayjs(date).format('YYYY-MM-DD HH:mm')
-}
 
 // 下载图片
 const handleDownload = () => {

@@ -73,13 +73,8 @@ import { ref, onMounted, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { addCommentUsingPost, listReplyCommentsUsingGet } from '@/api/commentController'
 import type { API } from '@/api/typings'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import 'dayjs/locale/zh-cn'
 import { MessageOutlined } from '@ant-design/icons-vue'
-
-dayjs.extend(relativeTime)
-dayjs.locale('zh-cn')
+import { formatTime } from '@/utils'
 
 interface Props {
   commentId: number | string
@@ -213,22 +208,6 @@ const cancelReply = () => {
 // 加载更多回复
 const loadMoreReplies = () => {
   fetchReplyList(current.value + 1, true)
-}
-
-// 格式化时间
-const formatTime = (time?: string) => {
-  if (!time) return ''
-  const date = dayjs(time)
-  const now = dayjs()
-  const diffHours = now.diff(date, 'hour')
-
-  if (diffHours < 24) {
-    return date.fromNow()
-  } else if (diffHours < 24 * 30) {
-    return date.format('MM-DD HH:mm')
-  } else {
-    return date.format('YYYY-MM-DD HH:mm')
-  }
 }
 
 // 判断是否应该显示"回复 @xxx"

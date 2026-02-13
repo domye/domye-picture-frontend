@@ -73,12 +73,12 @@ import {
   getPictureVoByIdUsingGet,
   listPictureTagCategoryUsingGet,
 } from '@/api/pictureController'
-import PictureUpload from '@/components/PictureUpload.vue'
+import PictureUpload from '@/components/picture/PictureUpload.vue'
 import router from '@/router'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
-import ImageCropper from '@/components/ImageCropper.vue'
+import ImageCropper from '@/components/picture/ImageCropper.vue'
 import { getSpaceVoByIdUsingGet } from '@/api/spaceController'
 const route = useRoute()
 

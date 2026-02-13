@@ -68,8 +68,8 @@ import {
   searchPictureByColorUsingPost,
 } from '@/api/pictureController'
 import { getSpaceVoByIdUsingGet } from '@/api/spaceController'
-import PictureList from '@/components/PictureList.vue'
-import PictureSearchForm from '@/components/PictureSearchForm.vue'
+import PictureList from '@/components/picture/PictureList.vue'
+import PictureSearchForm from '@/components/picture/PictureSearchForm.vue'
 import { ColorPicker } from 'vue3-colorpicker'
 import { message } from 'ant-design-vue'
 // import { filesize } from 'filesize'
