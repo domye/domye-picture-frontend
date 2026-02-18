@@ -23,6 +23,7 @@ export const PICTURE_EDIT_MESSAGE_TYPE_ENUM = {
   ENTER_EDIT: 'ENTER_EDIT',
   EXIT_EDIT: 'EXIT_EDIT',
   EDIT_ACTION: 'EDIT_ACTION',
+  SYNC_STATE: 'SYNC_STATE',
 }
 
 export const PICTURE_EDIT_MESSAGE_TYPE_MAP = {
@@ -31,6 +32,7 @@ export const PICTURE_EDIT_MESSAGE_TYPE_MAP = {
   ENTER_EDIT: '进入编辑状态',
   EXIT_EDIT: '退出编辑状态',
   EDIT_ACTION: '执行编辑操作',
+  SYNC_STATE: '同步编辑状态',
 }
 
 export const PICTURE_EDIT_ACTION_ENUM = {

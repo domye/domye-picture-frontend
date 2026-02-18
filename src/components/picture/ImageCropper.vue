@@ -70,6 +70,21 @@ const isTeamSpace = computed(() => {
 // 获取图片裁切器的引用
 const cropperRef = ref()
 
+// 缩放比例（静默执行，不发送消息）
+const changeScaleSilent = (num: number) => {
+  cropperRef.value?.changeScale(num)
+}
+
+// 向左旋转（静默执行，不发送消息）
+const rotateLeftSilent = () => {
+  cropperRef.value.rotateLeft()
+}
+
+// 向右旋转（静默执行，不发送消息）
+const rotateRightSilent = () => {
+  cropperRef.value.rotateRight()
+}
+
 // 缩放比例
 const changeScale = (num) => {
   cropperRef.value?.changeScale(num)
@@ -192,10 +207,8 @@ const initWebsocket = () => {
   }
   // 创建 websocket 实例
   websocket = new PictureEditWebSocket(pictureId)
-  // 建立连接
-  websocket.connect()
 
-  // 监听一系列的事件
+  // 先注册事件处理器，再建立连接（避免竞态条件）
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.INFO, (msg) => {
     console.log('收到通知消息：', msg)
     message.info(msg.message)
@@ -215,19 +228,19 @@ const initWebsocket = () => {
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EDIT_ACTION, (msg) => {
     console.log('收到编辑操作的消息：', msg)
     message.info(msg.message)
-    // 根据收到的编辑操作，执行相应的操作
+    // 根据收到的编辑操作，执行相应的操作（使用静默方法，避免消息循环）
     switch (msg.editAction) {
       case PICTURE_EDIT_ACTION_ENUM.ROTATE_LEFT:
-        rotateLeft()
+        rotateLeftSilent()
         break
       case PICTURE_EDIT_ACTION_ENUM.ROTATE_RIGHT:
-        rotateRight()
+        rotateRightSilent()
         break
       case PICTURE_EDIT_ACTION_ENUM.ZOOM_IN:
-        changeScale(1)
+        changeScaleSilent(1)
         break
       case PICTURE_EDIT_ACTION_ENUM.ZOOM_OUT:
-        changeScale(-1)
+        changeScaleSilent(-1)
         break
     }
   })
@@ -237,6 +250,37 @@ const initWebsocket = () => {
     message.info(msg.message)
     editingUser.value = undefined
   })
+
+  // 同步编辑状态（新用户加入时）
+  websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.SYNC_STATE, (msg) => {
+    console.log('收到同步编辑状态的消息：', msg)
+    if (msg.rotateDegree !== undefined || msg.scaleRatio !== undefined) {
+      // 应用旋转角度
+      if (msg.rotateDegree !== undefined && cropperRef.value) {
+        const rotations = msg.rotateDegree / 90
+        for (let i = 0; i < Math.abs(rotations); i++) {
+          if (rotations > 0) {
+            rotateRightSilent()
+          } else {
+            rotateLeftSilent()
+          }
+        }
+      }
+      // 应用缩放比例
+      if (msg.scaleRatio !== undefined && cropperRef.value && msg.scaleRatio !== 1.0) {
+        // 计算需要的缩放次数
+        const scaleDiff = msg.scaleRatio - 1.0
+        const scaleSteps = Math.round(Math.abs(scaleDiff) / 0.1)
+        for (let i = 0; i < scaleSteps; i++) {
+          changeScaleSilent(scaleDiff > 0 ? 1 : -1)
+        }
+      }
+      message.success('已同步编辑状态')
+    }
+  })
+
+  // 最后建立连接
+  websocket.connect()
 }
 
 // 监听属性和 visible 变化，初始化 WebSocket 连接

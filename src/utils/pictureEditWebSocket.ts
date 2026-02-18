@@ -13,6 +13,8 @@ export type WsMessage = {
     userName: string
     userAvatar: string
   }
+  rotateDegree?: number
+  scaleRatio?: number
 }
 
 /**
