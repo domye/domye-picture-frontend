@@ -200,7 +200,8 @@ const handleCommentUpdated = (updatedComment: API.CommentListVO) => {
     (comment) => comment.commentId === updatedComment.commentId,
   )
   if (index !== -1) {
-    commentList.value[index] = updatedComment
+    // 使用 splice 确保 Vue 响应式更新
+    commentList.value.splice(index, 1, updatedComment)
   }
 }
 

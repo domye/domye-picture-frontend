@@ -52,18 +52,15 @@
       </a-input>
     </div>
 
-    <!-- 回复预览列表 -->
+    <!-- 回复预览列表（未展开时显示） -->
     <div
-      v-if="comment.replyPreviewList && comment.replyPreviewList.length > 0"
+      v-if="!showReplies && comment.replyPreviewList && comment.replyPreviewList.length > 0"
       class="reply-preview-container"
     >
-      <div
-        v-if="!showReplies && comment.replyCount > comment.replyPreviewList.length"
-        class="reply-preview-list"
-      >
+      <div class="reply-preview-list">
         <div
-          v-for="reply in comment.replyPreviewList"
-          :key="reply.commentId"
+          v-for="(reply, index) in comment.replyPreviewList"
+          :key="reply.commentId || `preview-${index}`"
           class="reply-preview-item"
         >
           <a-avatar :src="reply.userAvatar" :alt="String(reply.userName || '用户')" :size="24">
@@ -79,15 +76,16 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- 完整回复列表 -->
+    <!-- 完整回复列表（展开时显示） -->
+    <div v-if="showReplies" class="reply-preview-container">
       <CommentReplyList
         ref="replyListRef"
-        v-if="showReplies"
         :comment-id="comment.commentId"
         :picture-id="pictureId"
         @delete-success="handleDeleteSuccess"
-        @reply-success-from-list="handleReplySuccessFromList"
+        @new-reply-added="handleNewReplyAdded"
       />
     </div>
   </div>
@@ -101,6 +99,7 @@ import type { API } from '@/api/typings'
 import CommentReplyList from './CommentReplyList.vue'
 import { MessageOutlined } from '@ant-design/icons-vue'
 import { formatTime } from '@/utils'
+import { useLoginUserStore } from '@/stores/useLoginUserStore'
 
 interface Props {
   comment: API.CommentListVO
@@ -238,13 +237,38 @@ const handleSubmitReply = async () => {
 
     if (res.data.code === 0) {
       message.success('回复成功')
+      const newReplyId = res.data.data || `temp-${Date.now()}`
+      const currentUser = useLoginUserStore().loginUser
+
+      // 构建新回复对象
+      const newReply: API.CommentReplyVO = {
+        commentId: newReplyId,
+        userId: currentUser?.id,
+        userName: currentUser?.userName || '我',
+        userAvatar: currentUser?.userAvatar || '',
+        content: content,
+        parentId: props.comment.commentId,
+        createTime: new Date().toISOString(),
+      }
+
       replyContent.value = ''
       showReplyInput.value = false
-      await loadReplyPreviews()
-      // 刷新回复列表组件
-      if (replyListRef.value) {
-        await replyListRef.value.refresh()
+
+      // 创建更新后的评论对象（不直接修改 props）
+      const updatedReplyPreviewList = [...(props.comment.replyPreviewList || []), newReply]
+      const updatedComment: API.CommentListVO = {
+        ...props.comment,
+        replyPreviewList: updatedReplyPreviewList,
+        replyCount: (props.comment.replyCount || 0) + 1,
       }
+
+      // 如果回复列表已展开，使用乐观更新添加新回复
+      if (replyListRef.value && showReplies.value) {
+        replyListRef.value.addReply(newReply)
+      }
+
+      // 通知父组件更新
+      emit('commentUpdated', updatedComment)
     } else {
       message.error('回复失败：' + res.data.message)
     }
@@ -266,9 +290,18 @@ const toggleReplyList = () => {
   showReplies.value = !showReplies.value
 }
 
-// 回复成功回调（从回复列表来的）
-const handleReplySuccessFromList = async () => {
-  await loadReplyPreviews()
+// 回复成功回调（从回复列表来的，带有新回复数据）
+const handleNewReplyAdded = (newReply: API.CommentReplyVO) => {
+  // 创建更新后的评论对象（不直接修改 props）
+  const updatedReplyPreviewList = [...(props.comment.replyPreviewList || []), newReply]
+  const updatedComment: API.CommentListVO = {
+    ...props.comment,
+    replyPreviewList: updatedReplyPreviewList,
+    replyCount: (props.comment.replyCount || 0) + 1,
+  }
+
+  // 通知父组件更新
+  emit('commentUpdated', updatedComment)
   emit('replySuccess')
 }
 

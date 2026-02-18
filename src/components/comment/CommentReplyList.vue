@@ -2,7 +2,11 @@
   <div class="reply-list-container">
     <a-spin :spinning="loading">
       <div v-if="replyList.length > 0" class="reply-list">
-        <div v-for="reply in replyList" :key="reply.commentId" class="reply-item">
+        <div
+          v-for="(reply, index) in replyList"
+          :key="reply.commentId || `reply-${index}`"
+          class="reply-item"
+        >
           <a-avatar :src="reply.userAvatar" :alt="String(reply.userName || '用户')" :size="28">
             {{ (reply.userName || '用户').toString().charAt(0) }}
           </a-avatar>
@@ -69,12 +73,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { addCommentUsingPost, listReplyCommentsUsingGet } from '@/api/commentController'
 import type { API } from '@/api/typings'
 import { MessageOutlined } from '@ant-design/icons-vue'
 import { formatTime } from '@/utils'
+import { useLoginUserStore } from '@/stores/useLoginUserStore'
 
 interface Props {
   commentId: number | string
@@ -86,7 +91,8 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   deleteSuccess: []
   replySuccess: []
-  replySuccessFromList: []
+  // 传递新回复数据给父组件
+  newReplyAdded: [API.CommentReplyVO]
 }>()
 
 // 回复列表
@@ -186,9 +192,29 @@ const handleSubmitReply = async (reply: API.CommentReplyVO) => {
       message.success('回复成功')
       replyContent.value = ''
       showReplyInputFor.value = null
-      await fetchReplyList(1, false)
+
+      // 乐观更新：直接将新回复添加到列表末尾，保持当前分页状态
+      const newReplyId = res.data.data || `temp-${Date.now()}`
+      const currentUser = useLoginUserStore().loginUser
+
+      // 构建新回复对象
+      const newReply: API.CommentReplyVO = {
+        commentId: newReplyId,
+        userId: currentUser?.id,
+        userName: currentUser?.userName || '我',
+        userAvatar: currentUser?.userAvatar || '',
+        content: content,
+        parentId: reply.commentId,
+        parentUserName: reply.userName,
+        createTime: new Date().toISOString(),
+      }
+
+      // 直接追加到列表末尾
+      replyList.value.push(newReply)
+      total.value += 1
+
       emit('replySuccess')
-      emit('replySuccessFromList')
+      emit('newReplyAdded', newReply)
     } else {
       message.error('回复失败：' + res.data.message)
     }
@@ -261,15 +287,14 @@ watch(
   { immediate: true },
 )
 
-// 暴露刷新方法给父组件
+// 暴露方法给父组件
 defineExpose({
   refresh: () => fetchReplyList(1, false),
-})
-
-onMounted(() => {
-  if (props.commentId && props.pictureId) {
-    fetchReplyList(1, false)
-  }
+  // 添加新回复（乐观更新，保持当前分页状态）
+  addReply: (newReply: API.CommentReplyVO) => {
+    replyList.value.push(newReply)
+    total.value += 1
+  },
 })
 </script>
 
