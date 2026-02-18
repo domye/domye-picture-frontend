@@ -2,11 +2,17 @@ import { getWsBaseUrl } from '@/config/env'
 import { wsLogger } from './logger'
 
 /**
- * WebSocket 消息类型
+ * WebSocket 消息类型（匹配后端 PictureEditResponseMessage）
  */
 export type WsMessage = {
   type: string
-  data?: unknown
+  message?: string
+  editAction?: string
+  user?: {
+    id: number
+    userName: string
+    userAvatar: string
+  }
 }
 
 /**
@@ -80,7 +86,9 @@ export default class PictureEditWebSocket {
       try {
         const message: WsMessage = JSON.parse(event.data)
         wsLogger.message(message)
-        this.triggerEvent(message.type, message.data)
+        // 后端消息格式: { type, message, user, editAction }
+        // 将整个消息对象作为 data 传递，而不是 message.data
+        this.triggerEvent(message.type, message)
       } catch (error) {
         wsLogger.error('解析消息失败', error)
       }
