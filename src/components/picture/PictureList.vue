@@ -71,14 +71,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 // 跳转至图片详情
 const router = useRouter()
-const doClickPicture = (picture) => {
+const doClickPicture = (picture: API.PictureVO) => {
   router.push({
     path: `/picture/${picture.id}`,
   })
 }
 
 // 编辑
-const doEdit = (picture, e) => {
+const doEdit = (picture: API.PictureVO, e: Event) => {
   e.stopPropagation()
   router.push({
     path: '/add_picture',
@@ -89,8 +89,8 @@ const doEdit = (picture, e) => {
   })
 }
 
-// 删除
-const doDelete = async (picture, e) => {
+// ��除
+const doDelete = async (picture: API.PictureVO, e: Event) => {
   e.stopPropagation()
   const id = picture.id
   if (!id) {

@@ -1,32 +1,35 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// 页面组件导入
-import HomePage from '@/pages/HomePage.vue'
-import Rank from '@/pages/rank/Rank.vue'
+// 页面组件懒加载 - 按路由分割代码，提升首屏加载速度
+const HomePage = () => import('@/pages/HomePage.vue')
+const Rank = () => import('@/pages/rank/Rank.vue')
 
 // 用户相关页面
-import UserLoginPage from '@/pages/user/UserLoginPage.vue'
-import UserRegisterPage from '@/pages/user/UserRegisterPage.vue'
+const UserLoginPage = () => import('@/pages/user/UserLoginPage.vue')
+const UserRegisterPage = () => import('@/pages/user/UserRegisterPage.vue')
+const UpdateUserPage = () => import('@/pages/user/UpdateUserPage.vue')
 
 // 空间相关页面
-import MySpacePage from '@/pages/space/MySpace.vue'
-import AddSpacePage from '@/pages/space/AddSpacePage.vue'
-import SpaceDetailPage from '@/pages/space/SpaceDetailPage.vue'
-import SpaceAnalyzePage from '@/pages/space/SpaceAnalyzePage.vue'
+const MySpacePage = () => import('@/pages/space/MySpace.vue')
+const AddSpacePage = () => import('@/pages/space/AddSpacePage.vue')
+const SpaceDetailPage = () => import('@/pages/space/SpaceDetailPage.vue')
+const SpaceAnalyzePage = () => import('@/pages/space/SpaceAnalyzePage.vue')
 
 // 图片相关页面
-import AddPicturePage from '@/pages/picture/AddPicturePage.vue'
-import PictureDetailPage from '@/pages/picture/PictureDetailPage.vue'
+const AddPicturePage = () => import('@/pages/picture/AddPicturePage.vue')
+const PictureDetailPage = () => import('@/pages/picture/PictureDetailPage.vue')
+
+// 投票相关页面
+const AddVoteActivityPage = () => import('@/pages/vote/AddVoteActivityPage.vue')
+const VotePage = () => import('@/pages/vote/VotePage.vue')
+const VoteDetailPage = () => import('@/pages/vote/VoteDetailPage.vue')
 
 // 管理员相关页面
-import UserManagePage from '@/pages/admin/UserManagePage.vue'
-import PictureManagePage from '@/pages/admin/PictureManagePage.vue'
-import SpaceManagePage from '@/pages/admin/SpaceManagePage.vue'
-import SpaceUserManagePage from '@/pages/admin/SpaceUserManagePage.vue'
-import VoteManagePage from '@/pages/admin/VoteManagePage.vue'
-import AddVoteActivityPage from '@/pages/vote/AddVoteActivityPage.vue'
-import VotePage from '@/pages/vote/VotePage.vue'
-import VoteDetailPage from '@/pages/vote/VoteDetailPage.vue'
+const UserManagePage = () => import('@/pages/admin/UserManagePage.vue')
+const PictureManagePage = () => import('@/pages/admin/PictureManagePage.vue')
+const SpaceManagePage = () => import('@/pages/admin/SpaceManagePage.vue')
+const SpaceUserManagePage = () => import('@/pages/admin/SpaceUserManagePage.vue')
+const VoteManagePage = () => import('@/pages/admin/VoteManagePage.vue')
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

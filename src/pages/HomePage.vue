@@ -128,9 +128,10 @@ const fetchData = async () => {
   loading.value = false
 }
 
-// 页面加载时获取数据，请求一次
+// 页面加载时获取数据
 onMounted(() => {
   fetchData()
+  getTagCategoryOptions()
 })
 
 // 搜索
@@ -225,10 +226,6 @@ const onShowSizeChange = (current: number, size: number) => {
   searchParams.pageSize = size
   fetchData()
 }
-
-onMounted(() => {
-  getTagCategoryOptions()
-})
 </script>
 
 <style scoped>
@@ -386,7 +383,7 @@ onMounted(() => {
   .waterfall-container {
     column-count: 1 !important;
   }
-  
+
   .search-input {
     border-radius: 20px;
   }

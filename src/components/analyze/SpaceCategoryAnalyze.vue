@@ -27,6 +27,7 @@ import { computed, ref, watchEffect, onMounted, onBeforeUnmount } from 'vue'
 import { getSpaceCategoryAnalyzeUsingPost } from '@/api/spaceAnalyzeController.ts'
 import { message } from 'ant-design-vue'
 import { useWindowSize } from '@vueuse/core'
+import { logger } from '@/utils/logger'
 
 interface Props {
   queryAll?: boolean
@@ -89,7 +90,7 @@ const fetchData = async () => {
     }
   } catch (e) {
     message.error('请求失败，请检查网络')
-    console.error(e)
+    logger.error('获取分类分析数据失败', e)
   } finally {
     loading.value = false
   }

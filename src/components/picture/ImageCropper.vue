@@ -210,23 +210,23 @@ const initWebsocket = () => {
 
   // 先注册事件处理器，再建立连接（避免竞态条件）
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.INFO, (msg) => {
-    console.log('收到通知消息：', msg)
+    logger.log('收到通知消息', msg)
     message.info(msg.message)
   })
 
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.ERROR, (msg) => {
-    console.log('收到错误通知：', msg)
+    logger.error('收到错误通知', msg)
     message.info(msg.message)
   })
 
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.ENTER_EDIT, (msg) => {
-    console.log('收到进入编辑状态的消息：', msg)
+    logger.log('收到进入编辑状态的消息', msg)
     message.info(msg.message)
     editingUser.value = msg.user
   })
 
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EDIT_ACTION, (msg) => {
-    console.log('收到编辑操作的消息：', msg)
+    logger.log('收到编辑操作的消息', msg)
     message.info(msg.message)
     // 根据收到的编辑操作，执行相应的操作（使用静默方法，避免消息循环）
     switch (msg.editAction) {
@@ -246,14 +246,14 @@ const initWebsocket = () => {
   })
 
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EXIT_EDIT, (msg) => {
-    console.log('收到退出编辑状态的消息：', msg)
+    logger.log('收到退出编辑状态的消息', msg)
     message.info(msg.message)
     editingUser.value = undefined
   })
 
   // 同步编辑状态（新用户加入时）
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.SYNC_STATE, (msg) => {
-    console.log('收到同步编辑状态的消息：', msg)
+    logger.log('收到同步编辑状态的消息', msg)
     if (msg.rotateDegree !== undefined || msg.scaleRatio !== undefined) {
       // 应用旋转角度
       if (msg.rotateDegree !== undefined && cropperRef.value) {

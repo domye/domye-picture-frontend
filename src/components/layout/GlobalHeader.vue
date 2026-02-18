@@ -8,7 +8,11 @@
         <RouterLink to="/">
           <div class="title-bar hover-scale">
             <!-- logo 图片 -->
-            <img class="logo pulse" src="https://cdn.domye.top/uploads/07/1752738903.ico" alt="logo" />
+            <img
+              class="logo pulse"
+              src="https://cdn.domye.top/uploads/07/1752738903.ico"
+              alt="logo"
+            />
             <!-- 网站标题 -->
             <div class="title">栖影</div>
           </div>
@@ -75,8 +79,6 @@ import { userLogoutUsingPost } from '@/api/userController'
 
 // 初始化用户登录状态 store
 const loginUserStore = useLoginUserStore()
-// 获取当前登录用户信息
-loginUserStore.fetchLoginUser()
 
 // 初始化路由
 const router = useRouter()
@@ -275,11 +277,11 @@ const items = computed<MenuProps['items']>(() => filterMenus(originItems))
   .title {
     font-size: 16px;
   }
-  
+
   .logo {
     height: 30px;
   }
-  
+
   .username {
     display: none;
   }

@@ -248,7 +248,6 @@ const fetchData = async () => {
     // 确保total是数字类型
     total.value = Number(res.data.data.total) ?? 0
     await getUserFilterStatus()
-    console.log(dataList.value)
   } else {
     message.error('获取数据失败，' + res.data.message)
   }

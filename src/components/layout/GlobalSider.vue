@@ -71,21 +71,25 @@ const menuItems = computed(() => {
 })
 
 // 加载团队空间列表
+const teamSpaceLoaded = ref(false)
 const fetchTeamSpaceList = async () => {
+  // 防止重复请求
+  if (teamSpaceLoaded.value) return
+
   const res = await listMyTeamSpaceUsingPost()
   if (res.data.code === 0 && res.data.data) {
     teamSpaceList.value = res.data.data
+    teamSpaceLoaded.value = true
   } else {
     message.error('加载我的团队空间失败，' + res.data.message)
   }
 }
 
 /**
- * 监听变量，改变时触发数据的重新加载
+ * 监听登录状态变化，只在首次登录时加载数据
  */
 watchEffect(() => {
-  // 登录才加载
-  if (loginUserStore.loginUser.id) {
+  if (loginUserStore.loginUser.id && !teamSpaceLoaded.value) {
     fetchTeamSpaceList()
   }
 })

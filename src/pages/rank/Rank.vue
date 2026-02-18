@@ -64,9 +64,7 @@ const fetchData = async (period: number) => {
   try {
     const res = await getUserActivityScoreUsingGet(params)
     if (res.data.code === 0) {
-      console.log('API返回的数据:', res.data.data)
       rankList.value = res.data.data
-      console.log('排行榜数据:', rankList.value)
     } else {
       message.error('获取排行榜失败，' + res.data.message)
     }

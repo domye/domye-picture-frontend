@@ -124,7 +124,6 @@ const doEditPicture = () => {
 
 //上传图片
 const handleSubmit = async (values: any) => {
-  console.log(values)
   const pictureId = picture.value.id
   if (!pictureId) {
     return
