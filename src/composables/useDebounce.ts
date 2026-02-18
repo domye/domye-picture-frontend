@@ -1,30 +1,30 @@
 import { ref, watch, type Ref } from 'vue'
 
 export interface UseDebounceOptions {
-  /** Delay in milliseconds, default 300 */
+  /** 延迟时间（毫秒），默认 300 */
   delay?: number
-  /** Execute on leading edge, default false */
+  /** 是否在开始边缘执行，默认 false */
   leading?: boolean
-  /** Execute on trailing edge, default true */
+  /** 是否在结束边缘执行，默认 true */
   trailing?: boolean
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface UseDebounceReturn<T extends (...args: any[]) => any> {
-  /** Debounced function */
+  /** 防抖后的函数 */
   debouncedFn: T
-  /** Whether a call is pending */
+  /** 是否有待执行的调用 */
   isPending: Ref<boolean>
-  /** Cancel pending execution */
+  /** 取消待执行 */
   cancel: () => void
-  /** Flush pending execution immediately */
+  /** 立即执行待执行的调用 */
   flush: () => void
 }
 
 /**
- * Debounce composable for delaying function execution
- * @param fn Function to debounce
- * @param options Debounce options
+ * 防抖 Composable，用于延迟函数执行
+ * @param fn 需要防抖的函数
+ * @param options 防抖选项
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useDebounce<T extends (...args: any[]) => any>(
@@ -82,9 +82,9 @@ export function useDebounce<T extends (...args: any[]) => any>(
 }
 
 /**
- * Debounce a ref value
- * @param value Ref to debounce
- * @param delay Delay in milliseconds
+ * 防抖 Ref 值
+ * @param value 需要防抖的 Ref
+ * @param delay 延迟时间（毫秒）
  */
 export function useDebouncedRef<T>(value: Ref<T>, delay = 300) {
   const debouncedValue = ref(value.value) as Ref<T>

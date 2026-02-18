@@ -20,7 +20,7 @@ export interface UseTagCategoriesReturn {
 let cachedTagList: string[] | null = null
 let cachedCategoryList: string[] | null = null
 let cacheTime = 0
-const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+const CACHE_TTL = 5 * 60 * 1000 // 5 分钟
 
 /**
  * 标签分类 Composable

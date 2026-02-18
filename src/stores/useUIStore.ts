@@ -7,21 +7,21 @@ const THEME_KEY = 'theme'
 const SIDEBAR_KEY = 'sidebarCollapsed'
 
 export const useUIStore = defineStore('ui', () => {
-  // Theme state
+  // 主题状态
   const theme = ref<ThemeMode>((localStorage.getItem(THEME_KEY) as ThemeMode) || 'light')
 
-  // Sidebar state
+  // 侧边栏状态
   const sidebarCollapsed = ref<boolean>(localStorage.getItem(SIDEBAR_KEY) === 'true')
 
-  // Mobile menu state
+  // 移动端菜单状态
   const mobileMenuVisible = ref(false)
 
-  // Watch for changes and persist
+  // 监听变化并持久化
   watch(
     theme,
     (newTheme) => {
       localStorage.setItem(THEME_KEY, newTheme)
-      // Apply theme to document
+      // 应用主题到文档
       document.documentElement.setAttribute('data-theme', newTheme)
     },
     { immediate: true },
@@ -31,7 +31,7 @@ export const useUIStore = defineStore('ui', () => {
     localStorage.setItem(SIDEBAR_KEY, String(collapsed))
   })
 
-  // Theme operations
+  // 主题操作
   const toggleTheme = () => {
     theme.value = theme.value === 'light' ? 'dark' : 'light'
   }
@@ -40,7 +40,7 @@ export const useUIStore = defineStore('ui', () => {
     theme.value = newTheme
   }
 
-  // Sidebar operations
+  // 侧边栏操作
   const toggleSidebar = () => {
     sidebarCollapsed.value = !sidebarCollapsed.value
   }
@@ -49,7 +49,7 @@ export const useUIStore = defineStore('ui', () => {
     sidebarCollapsed.value = collapsed
   }
 
-  // Mobile menu operations
+  // 移动端菜单操作
   const toggleMobileMenu = () => {
     mobileMenuVisible.value = !mobileMenuVisible.value
   }

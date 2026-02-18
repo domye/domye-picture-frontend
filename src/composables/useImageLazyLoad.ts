@@ -1,41 +1,41 @@
 import { ref, onMounted, onUnmounted, type Ref } from 'vue'
 
 export interface UseImageLazyLoadOptions {
-  /** Root element for intersection, default viewport */
+  /** 交叉观察的根元素，默认视口 */
   root?: Element | null
-  /** Margin around root, default '0px' */
+  /** 根元素边距，默认 '50px' */
   rootMargin?: string
-  /** Visibility threshold, default 0.1 (10%) */
+  /** 可见阈值，默认 0.1 (10%) */
   threshold?: number
-  /** Placeholder image while loading */
+  /** 加载中的占位图 */
   placeholder?: string
-  /** Error image on load failure */
+  /** 加载失败时的图片 */
   errorImage?: string
-  /** Load immediately without intersection */
+  /** 立即加载，不等待交叉 */
   immediate?: boolean
 }
 
 export interface UseImageLazyLoadReturn {
-  /** Current image source (placeholder, actual, or error) */
+  /** 当前图片地址（占位图、实际图片或错误图） */
   imageSrc: Ref<string>
-  /** Whether image is loaded */
+  /** 图片是否已加载 */
   isLoaded: Ref<boolean>
-  /** Whether image failed to load */
+  /** 图片是否加载失败 */
   isError: Ref<boolean>
-  /** Whether image is currently loading */
+  /** 图片是否正在加载 */
   isLoading: Ref<boolean>
-  /** Element ref to observe */
+  /** 需要观察的元素引用 */
   elementRef: Ref<HTMLImageElement | null>
-  /** Manually trigger load */
+  /** 手动触发加载 */
   load: () => void
-  /** Reset state */
+  /** 重置状态 */
   reset: () => void
 }
 
 /**
- * Image lazy loading composable using IntersectionObserver
- * @param src Actual image source
- * @param options Lazy load options
+ * 图片懒加载 Composable，使用 IntersectionObserver 实现
+ * @param src 实际图片地址
+ * @param options 懒加载选项
  */
 export function useImageLazyLoad(
   src: string,
@@ -143,9 +143,10 @@ export function useImageLazyLoad(
 }
 
 /**
- * Batch image lazy loading for lists
- * @param count Number of images to track
- * @param options Lazy load options
+ * 批量图片懒加载，用于列表场景
+ * @param getImageSrc 根据索引获取图片地址的函数
+ * @param count 图片数量
+ * @param options 懒加载选项
  */
 export function useImageLazyLoadBatch(
   getImageSrc: (index: number) => string,

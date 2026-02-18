@@ -2,21 +2,21 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
 const STORAGE_KEY = 'currentSpaceId'
-const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+const CACHE_TTL = 5 * 60 * 1000 // 5 分钟缓存时间
 
 export const useSpaceStore = defineStore('space', () => {
-  // Space list cache
+  // 空间列表缓存
   const spaceList = ref<API.SpaceVO[]>([])
   const spaceCacheTime = ref<number>(0)
 
-  // Current space
+  // 当前空间
   const currentSpaceId = ref<string | number | null>(localStorage.getItem(STORAGE_KEY))
 
   const currentSpace = computed(() =>
     spaceList.value.find((s) => String(s.id) === String(currentSpaceId.value)),
   )
 
-  // Cache operations
+  // 缓存操作
   const setSpaceList = (list: API.SpaceVO[]) => {
     spaceList.value = list
     spaceCacheTime.value = Date.now()
@@ -35,11 +35,11 @@ export const useSpaceStore = defineStore('space', () => {
     }
   }
 
-  // Find space by ID
+  // 按 ID 查找空间
   const getSpaceById = (id: string | number) =>
     spaceList.value.find((s) => String(s.id) === String(id))
 
-  // Clear cache
+  // 清除缓存
   const clearCache = () => {
     spaceList.value = []
     spaceCacheTime.value = 0

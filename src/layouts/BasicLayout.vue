@@ -17,9 +17,11 @@
         </a-layout-sider>
         <a-layout-content class="content fade-in-delay-1">
           <router-view v-slot="{ Component }">
-            <keep-alive :include="['HomePage', 'Rank']">
-              <component :is="Component" />
-            </keep-alive>
+            <transition name="fade-slide">
+              <keep-alive :include="['HomePage', 'Rank']">
+                <component :is="Component" />
+              </keep-alive>
+            </transition>
           </router-view>
         </a-layout-content>
       </a-layout>
@@ -77,12 +79,29 @@ const loginUserStore = useLoginUserStore()
   background: transparent;
   border-radius: 8px;
   margin: 0 16px 56px 16px;
-  transition: all 0.3s ease;
   margin-left: 32px;
 }
 
 #basicLayout .content:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* 路由过渡动画 - 淡入淡出 + 轻微滑动 */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateX(10px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-10px);
 }
 
 #basicLayout .sider {

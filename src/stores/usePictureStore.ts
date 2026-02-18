@@ -2,16 +2,16 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
 export const usePictureStore = defineStore('picture', () => {
-  // Picture cache by ID
+  // 图片缓存（按 ID 索引）
   const pictureCache = ref<Map<string | number, API.PictureVO>>(new Map())
 
-  // Preload queue for detail view
+  // 预加载队列（用于详情页）
   const preloadQueue = ref<Set<string | number>>(new Set())
 
-  // Loading states
+  // 加载状态
   const loadingIds = ref<Set<string | number>>(new Set())
 
-  // Cache operations
+  // 缓存操作
   const getCached = (id: string | number) => pictureCache.value.get(id)
 
   const cachePicture = (picture: API.PictureVO) => {
@@ -26,15 +26,15 @@ export const usePictureStore = defineStore('picture', () => {
     })
   }
 
-  // Preload operations
+  // 预加载操作
   const addToPreloadQueue = (id: string | number) => preloadQueue.value.add(id)
   const removeFromPreloadQueue = (id: string | number) => preloadQueue.value.delete(id)
 
-  // Cache invalidation
+  // 缓存失效
   const invalidateCache = () => pictureCache.value.clear()
   const invalidatePicture = (id: string | number) => pictureCache.value.delete(id)
 
-  // Loading state tracking
+  // 加载状态追踪
   const setLoading = (id: string | number, loading: boolean) => {
     if (loading) {
       loadingIds.value.add(id)

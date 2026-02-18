@@ -1,30 +1,32 @@
 import { ref, type Ref } from 'vue'
 
 export interface UseThrottleOptions {
-  /** Interval in milliseconds, default 200 */
+  /** 间隔时间（毫秒），默认 200 */
   interval?: number
-  /** Execute on leading edge, default true */
+  /** 是否在开始边缘执行，默认 true */
   leading?: boolean
-  /** Execute on trailing edge, default true */
+  /** 是否在结束边缘执行，默认 true */
   trailing?: boolean
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface UseThrottleReturn<T extends (...args: any[]) => any> {
-  /** Throttled function */
+  /** 节流后的函数 */
   throttledFn: T
-  /** Whether a call is pending */
+  /** 是否有待执行的调用 */
   isPending: Ref<boolean>
-  /** Cancel pending execution */
+  /** 取消待执行 */
   cancel: () => void
-  /** Flush pending execution immediately */
+  /** 立即执行待执行的调用 */
   flush: () => void
 }
 
 /**
- * Throttle composable for limiting function execution rate
- * @param fn Function to throttle
- * @param options Throttle options
+ * 节流 Composable，用于限制函数执行频率
+ * @param fn 需要节流的函数
+ * @param options 节流选项
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useThrottle<T extends (...args: any[]) => any>(
   fn: T,
   options: UseThrottleOptions = {},
@@ -41,14 +43,14 @@ export function useThrottle<T extends (...args: any[]) => any>(
     const timeSinceLastCall = now - lastCallTime
     lastArgs = args
 
-    // Leading edge call
+    // 开始边缘调用
     if (leading && timeSinceLastCall >= interval) {
       lastCallTime = now
       fn(...args)
       return
     }
 
-    // Schedule trailing call
+    // 安排结束边缘调用
     isPending.value = true
 
     if (!timeoutId) {
@@ -88,13 +90,14 @@ export function useThrottle<T extends (...args: any[]) => any>(
 }
 
 /**
- * Throttle a ref value
- * @param value Ref to throttle
- * @param interval Interval in milliseconds
+ * 节流 Ref 值
+ * @param value 需要节流的 Ref
+ * @param interval 间隔时间（毫秒）
  */
 export function useThrottledRef<T>(value: Ref<T>, interval = 200) {
   const throttledValue = ref(value.value) as Ref<T>
-  const { throttledFn } = useThrottle(
+
+  useThrottle(
     (v: T) => {
       throttledValue.value = v
     },
