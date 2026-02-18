@@ -68,11 +68,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  editPictureUsingPost,
-  getPictureVoByIdUsingGet,
-  listPictureTagCategoryUsingGet,
-} from '@/api/pictureController'
+import { editPictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController'
 import PictureUpload from '@/components/picture/PictureUpload.vue'
 import router from '@/router'
 import { message } from 'ant-design-vue'
@@ -80,13 +76,16 @@ import { computed, onMounted, reactive, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import ImageCropper from '@/components/picture/ImageCropper.vue'
 import { getSpaceVoByIdUsingGet } from '@/api/spaceController'
+import { useTagCategories } from '@/composables'
+
 const route = useRoute()
+
+// 使用标签分类 composable
+const { tags: tagOptions, categories: categoryOptions } = useTagCategories()
 
 // 数据
 const picture = ref<API.PictureVO>()
 const pictureForm = reactive<API.PictureEditRequest>({})
-const categoryOptions = ref<string[]>([])
-const tagOptions = ref<string[]>([])
 
 // 空间 id
 const spaceId = computed(() => {
@@ -152,26 +151,6 @@ const onSuccess = (newPicture: API.PictureVO) => {
   pictureForm.name = newPicture.name
 }
 
-// 获取标签分类
-const getTagCategories = async () => {
-  const res = await listPictureTagCategoryUsingGet()
-  if (res.data.code === 0 && res.data.data) {
-    tagOptions.value = (res.data.data.tagList ?? []).map((data: string) => {
-      return {
-        value: data,
-        label: data,
-      }
-    })
-    categoryOptions.value = (res.data.data.categoryList ?? []).map((data: string) => {
-      return {
-        value: data,
-        label: data,
-      }
-    })
-  } else {
-    message.error('获取标签分类失败，' + res.data.message)
-  }
-}
 const space = ref<API.SpaceVO>()
 
 // 获取空间信息
@@ -193,7 +172,6 @@ watchEffect(() => {
 
 // 页面加载时请求一次
 onMounted(() => {
-  getTagCategories()
   getOldPicture()
 })
 </script>

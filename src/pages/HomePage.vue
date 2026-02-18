@@ -80,13 +80,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
-import {
-  listPictureTagCategoryUsingGet,
-  listPictureVoByPageUsingPost,
-} from '@/api/pictureController.ts'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { listPictureVoByPageUsingPost } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
+import { useTagCategories } from '@/composables'
+
+// 使用标签分类 composable
+const { tagList, categoryList, loading: tagsLoading } = useTagCategories()
 
 // 定义数据
 const dataList = ref<API.PictureVO[]>([])
@@ -100,6 +101,19 @@ const searchParams = reactive<API.PictureQueryRequest>({
   sortField: 'createTime',
   sortOrder: 'descend',
 })
+
+// 标签选择状态
+const selectedCategory = ref<string>('all')
+const selectedTagList = ref<boolean[]>([])
+
+// 监听 tagList 变化，初始化 selectedTagList
+watch(
+  tagList,
+  (newList) => {
+    selectedTagList.value = newList.map(() => false)
+  },
+  { immediate: true },
+)
 
 // 获取数据
 const fetchData = async () => {
@@ -131,7 +145,6 @@ const fetchData = async () => {
 // 页面加载时获取数据
 onMounted(() => {
   fetchData()
-  getTagCategoryOptions()
 })
 
 // 搜索
@@ -139,27 +152,6 @@ const doSearch = () => {
   // 重置搜索条件
   searchParams.current = 1
   fetchData()
-}
-
-// 标签和分类列表
-const categoryList = ref<string[]>([])
-const selectedCategory = ref<string>('all')
-const tagList = ref<string[]>([])
-const selectedTagList = ref<boolean[]>([])
-
-/**
- * 获取标签和分类选项
- * @param values
- */
-const getTagCategoryOptions = async () => {
-  const res = await listPictureTagCategoryUsingGet()
-  if (res.data.code === 0 && res.data.data) {
-    tagList.value = res.data.data.tagList ?? []
-    categoryList.value = res.data.data.categoryList ?? []
-    selectedTagList.value = tagList.value.map(() => false)
-  } else {
-    message.error('获取标签分类列表失败，' + res.data.message)
-  }
 }
 
 const router = useRouter()

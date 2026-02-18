@@ -31,6 +31,9 @@ const SpaceManagePage = () => import('@/pages/admin/SpaceManagePage.vue')
 const SpaceUserManagePage = () => import('@/pages/admin/SpaceUserManagePage.vue')
 const VoteManagePage = () => import('@/pages/admin/VoteManagePage.vue')
 
+// 404 页面
+const NotFoundPage = () => import('@/pages/NotFoundPage.vue')
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -138,6 +141,13 @@ const router = createRouter({
       name: '空间成员管理',
       component: SpaceUserManagePage,
       props: true,
+    },
+
+    // 404 捕获所有未匹配路由
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: NotFoundPage,
     },
   ],
 })

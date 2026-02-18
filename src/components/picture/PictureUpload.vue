@@ -30,19 +30,99 @@ interface Props {
 const loading = ref<boolean>(false)
 const props = defineProps<Props>()
 
-// 校验图片
-const beforeUpload = (file: UploadProps['fileList'][number]) => {
-  // 校验图片格式
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
-  if (!isJpgOrPng) {
-    message.error('不支持上传该格式的图片，推荐 jpg 或 png')
+// Supported image types with their MIME types and magic numbers
+const SUPPORTED_IMAGE_TYPES: Record<string, { mime: string; signatures: number[][] }> = {
+  jpeg: { mime: 'image/jpeg', signatures: [[0xff, 0xd8, 0xff]] },
+  png: { mime: 'image/png', signatures: [[0x89, 0x50, 0x4e, 0x47]] },
+  gif: { mime: 'image/gif', signatures: [[0x47, 0x49, 0x46, 0x38]] },
+  webp: { mime: 'image/webp', signatures: [[0x52, 0x49, 0x46, 0x46]] }, // RIFF
+}
+
+const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2MB
+const MAX_DIMENSION = 4096 // Max width/height
+
+/**
+ * Validate file by checking magic numbers (file signature)
+ */
+const validateFileSignature = async (file: File): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const arr = new Uint8Array(e.target?.result as ArrayBuffer)
+
+      // Check each supported type
+      for (const [, config] of Object.entries(SUPPORTED_IMAGE_TYPES)) {
+        for (const signature of config.signatures) {
+          const matches = signature.every((byte, index) => arr[index] === byte)
+          if (matches) {
+            resolve(true)
+            return
+          }
+        }
+      }
+      resolve(false)
+    }
+    reader.onerror = () => resolve(false)
+    reader.readAsArrayBuffer(file.slice(0, 8)) // Read first 8 bytes
+  })
+}
+
+/**
+ * Validate image dimensions
+ */
+const validateDimensions = (file: File): Promise<{ width: number; height: number } | null> => {
+  return new Promise((resolve) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      resolve({ width: img.width, height: img.height })
+    }
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url)
+      resolve(null)
+    }
+
+    img.src = url
+  })
+}
+
+const beforeUpload = async (file: UploadProps['fileList'][number]) => {
+  // 1. Validate file size
+  if (file.size > MAX_FILE_SIZE) {
+    message.error(`文件大小超出限制，最大支持 ${MAX_FILE_SIZE / 1024 / 1024}MB`)
+    return false
   }
-  // 校验图片大小
-  const isLt2M = file.size / 1024 / 1024 < 2
-  if (!isLt2M) {
-    message.error('不能上传超过 2M 的图片')
+
+  // 2. Validate MIME type
+  const allowedMimes = Object.values(SUPPORTED_IMAGE_TYPES).map((t) => t.mime)
+  if (!allowedMimes.includes(file.type)) {
+    message.error('不支持的图片格式，支持: JPEG, PNG, GIF, WebP')
+    return false
   }
-  return isJpgOrPng && isLt2M
+
+  // 3. Validate file signature (magic numbers)
+  const isValidSignature = await validateFileSignature(file)
+  if (!isValidSignature) {
+    message.error('文件内容与扩展名不匹配，请确认是否为真实图片文件')
+    return false
+  }
+
+  // 4. Validate dimensions
+  const dimensions = await validateDimensions(file)
+  if (!dimensions) {
+    message.error('无法读取图片尺寸，请确认文件是否损坏')
+    return false
+  }
+
+  if (dimensions.width > MAX_DIMENSION || dimensions.height > MAX_DIMENSION) {
+    message.error(`图片尺寸超出限制，最大支持 ${MAX_DIMENSION}x${MAX_DIMENSION} 像素`)
+    return false
+  }
+
+  return true
 }
 
 /**

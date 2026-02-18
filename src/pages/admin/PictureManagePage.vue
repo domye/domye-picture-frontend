@@ -61,11 +61,13 @@
       <a-table
         :columns="columns"
         :data-source="dataList"
-        :pagination="pagination"
+        :pagination="false"
         @change="doTableChange"
-        :scroll="{ x: 1500 }"
+        :scroll="{ x: 1500, y: 600 }"
         row-key="id"
         bordered
+        virtual
+        :virtual-item-size="54"
       >
         <!-- 自定义数据展示方式 -->
         <template #bodyCell="{ column, record }">
@@ -178,6 +180,19 @@
           </template>
         </template>
       </a-table>
+      <!-- 分页 -->
+      <div class="pagination-wrapper">
+        <a-pagination
+          v-model:current="searchParams.current"
+          v-model:page-size="searchParams.pageSize"
+          :total="total"
+          :show-total="(total) => `共 ${total} 条`"
+          show-size-changer
+          :page-size-options="['10', '20', '50', '100']"
+          @change="handlePageChange"
+          @show-size-change="handlePageSizeChange"
+        />
+      </div>
     </a-card>
   </div>
 </template>
@@ -185,24 +200,25 @@
 <script lang="ts" setup>
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import {
   deletePictureUsingPost,
   doPictureReviewUsingPost,
   listPictureByPageUsingPost,
-  listPictureTagCategoryUsingGet,
 } from '@/api/pictureController'
 import {
   PIC_REVIEW_STATUS_ENUM,
   PIC_REVIEW_STATUS_MAP,
   PIC_REVIEW_STATUS_OPTIONS,
 } from '@/constants/picture'
+import { useTagCategories } from '@/composables'
+
+// 使用标签分类 composable
+const { tags: tagOptions, categories: categoryOptions } = useTagCategories()
 
 // 数据
 const dataList = ref([])
 const total = ref(0)
-const categoryOptions = ref<string[]>([])
-const tagOptions = ref<string[]>([])
 
 // 表格列
 const columns = [
@@ -303,25 +319,27 @@ const handleReview = async (record: API.Picture, reviewStatus: number) => {
   }
 }
 
-// 分页参数
-const pagination = computed(() => {
-  return {
-    current: searchParams.current ?? 1,
-    pageSize: searchParams.pageSize ?? 10,
-    total: total.value,
-    showTotal: (total) => `共 ${total} 条`,
-    showSizeChanger: true,
-    pageSizeOptions: ['10', '20', '50', '100'],
-  }
-})
+// 分页变化
+const handlePageChange = (page: number) => {
+  searchParams.current = page
+  fetchData()
+}
 
-// 表格变化
-const doTableChange = (page: any, filters: any, sorter: any) => {
-  searchParams.current = page.current
-  searchParams.pageSize = page.pageSize
+// 每页数量变化
+const handlePageSizeChange = (current: number, size: number) => {
+  searchParams.pageSize = size
+  searchParams.current = 1
+  fetchData()
+}
+
+// 表格变化（排序）
+const doTableChange = (_page: any, _filters: any, sorter: any) => {
   if (sorter.field) {
     searchParams.sortField = sorter.field
     searchParams.sortOrder = sorter.order
+  } else {
+    searchParams.sortField = undefined
+    searchParams.sortOrder = undefined
   }
   fetchData()
 }
@@ -377,30 +395,8 @@ const doSearch = () => {
   fetchData()
 }
 
-// 获取标签分类
-const getTagCategories = async () => {
-  const res = await listPictureTagCategoryUsingGet()
-  if (res.data.code === 0 && res.data.data) {
-    tagOptions.value = (res.data.data.tagList ?? []).map((data: string) => {
-      return {
-        value: data,
-        label: data,
-      }
-    })
-    categoryOptions.value = (res.data.data.categoryList ?? []).map((data: string) => {
-      return {
-        value: data,
-        label: data,
-      }
-    })
-  } else {
-    message.error('获取标签分类失败，' + res.data.message)
-  }
-}
-
 // 页面加载时请求一次
 onMounted(() => {
-  getTagCategories()
   fetchData()
 })
 </script>
@@ -449,6 +445,12 @@ onMounted(() => {
   :deep(.ant-table-thead > tr > th) {
     background-color: #fafafa;
     font-weight: 500;
+  }
+
+  .pagination-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
   }
 }
 
