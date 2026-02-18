@@ -16,12 +16,10 @@
           <globalSider />
         </a-layout-sider>
         <a-layout-content class="content fade-in-delay-1">
-          <router-view v-slot="{ Component, route }">
-            <transition :name="transitionName" mode="out-in">
-              <keep-alive :include="cachedPages">
-                <component :is="Component" :key="route.fullPath" />
-              </keep-alive>
-            </transition>
+          <router-view v-slot="{ Component }">
+            <keep-alive :include="['HomePage', 'Rank']">
+              <component :is="Component" />
+            </keep-alive>
           </router-view>
         </a-layout-content>
       </a-layout>
@@ -31,26 +29,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import GlobalHeader from '@/components/layout/GlobalHeader.vue'
 import globalSider from '@/components/layout/GlobalSider.vue'
 
 const loginUserStore = useLoginUserStore()
-const route = useRoute()
-const transitionName = ref('fade')
-
-// Pages to cache in KeepAlive
-const cachedPages = ['HomePage', 'Rank']
-
-// Optional: change animation based on route depth
-watch(
-  () => route.path,
-  () => {
-    transitionName.value = 'fade'
-  },
-)
 </script>
 
 <style scoped>
@@ -123,45 +106,6 @@ watch(
   border-bottom: none !important;
   border-inline-end: none !important;
   border-radius: 8px !important;
-}
-
-/* Route transition animations */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-/* Slide transition (optional) */
-.slide-left-enter-active,
-.slide-left-leave-active,
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: all 0.3s ease;
-}
-
-.slide-left-enter-from {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.slide-left-leave-to {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
-.slide-right-enter-from {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
-.slide-right-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
 }
 
 /* 移动端适配 */
