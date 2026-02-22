@@ -89,6 +89,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponsePageContactVO_ = {
+    code?: number
+    data?: PageContactVO_
+    message?: string
+  }
+
   type BaseResponsePagePicture_ = {
     code?: number
     data?: PagePicture_
@@ -225,6 +231,32 @@ declare namespace API {
     userName?: string
   }
 
+  type ContactAddRequest = {
+    contactUserId?: number
+  }
+
+  type ContactHandleRequest = {
+    id?: number
+    status?: string
+  }
+
+  type ContactQueryRequest = {
+    current?: number
+    pageSize?: number
+    sortField?: string
+    sortOrder?: string
+    status?: number
+  }
+
+  type ContactVO = {
+    contactUser?: UserVO
+    contactUserId?: number
+    createTime?: string
+    id?: number
+    status?: number
+    userId?: number
+  }
+
   type DeleteRequest = {
     id?: number
   }
@@ -315,6 +347,14 @@ declare namespace API {
     current?: number
     pages?: number
     records?: CommentListVO[]
+    size?: number
+    total?: number
+  }
+
+  type PageContactVO_ = {
+    current?: number
+    pages?: number
+    records?: ContactVO[]
     size?: number
     total?: number
   }
