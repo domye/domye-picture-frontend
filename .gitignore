@@ -29,11 +29,4 @@ coverage
 
 *.tsbuildinfo
 dist.zip
-.sisyphus/boulder.json
-.sisyphus/evidence/mention-display-component-summary.md
-.sisyphus/evidence/task-1-keyboard-nav.md
-.sisyphus/evidence/task-1-selector-display.md
-.sisyphus/notepads/mention-feature/learnings.md
-.sisyphus/notepads/mention-feature/progress.md
-.sisyphus/notepads/mention-feature/wave1-completion.md
-.sisyphus/plans/mention-feature.md
+.sisyphus
