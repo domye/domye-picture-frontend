@@ -30,27 +30,29 @@
 
             <!-- 回复的回复输入框 -->
             <div v-if="showReplyInputFor === reply.commentId" class="reply-input-container">
-              <a-input
-                v-model:value="replyContent"
+              <MentionInput
+                :ref="(el) => setReplyRef(reply.commentId, el)"
+                v-model="replyContent"
+                :friends="friends || []"
                 :placeholder="`回复 ${reply.userName}`"
                 :maxlength="500"
+                :auto-size="{ minRows: 1, maxRows: 1 }"
                 @pressEnter="handleSubmitReply(reply)"
-              >
-                <template #suffix>
-                  <a-space>
-                    <a-button
-                      type="primary"
-                      size="small"
-                      :loading="submitting"
-                      :disabled="!replyContent.trim()"
-                      @click="handleSubmitReply(reply)"
-                    >
-                      发送
-                    </a-button>
-                    <a-button size="small" @click="cancelReply"> 取消 </a-button>
-                  </a-space>
-                </template>
-              </a-input>
+              />
+              <div class="reply-input-actions">
+                <a-space>
+                  <a-button
+                    type="primary"
+                    size="small"
+                    :loading="submitting"
+                    :disabled="!replyContent.trim()"
+                    @click="handleSubmitReply(reply)"
+                  >
+                    发送
+                  </a-button>
+                  <a-button size="small" @click="cancelReply"> 取消 </a-button>
+                </a-space>
+              </div>
             </div>
           </div>
         </div>
@@ -80,10 +82,12 @@ import type { API } from '@/api/typings'
 import { MessageOutlined } from '@ant-design/icons-vue'
 import { formatTime } from '@/utils'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
+import MentionInput from '@/components/mention/MentionInput.vue'
 
 interface Props {
   commentId: number | string
   pictureId: number | string
+  friends?: API.UserVO[]
 }
 
 const props = defineProps<Props>()
@@ -111,6 +115,13 @@ const hasMore = ref(false)
 const replyContent = ref('')
 const showReplyInputFor = ref<number | null>(null)
 const submitting = ref(false)
+
+// Store refs for each reply's MentionInput
+const replyInputRefs = ref<Map<string | number, InstanceType<typeof MentionInput>>>(new Map())
+
+const setReplyRef = (replyId: string | number, el: any) => {
+  if (el) replyInputRefs.value.set(replyId, el)
+}
 
 // 获取回复列表
 const fetchReplyList = async (page: number = 1, append: boolean = false) => {
@@ -170,13 +181,26 @@ const handleSubmitReply = async (reply: API.CommentReplyVO) => {
     return
   }
 
+  // Get mentioned users from the MentionInput ref
+  const mentionInputRef = replyInputRefs.value.get(reply.commentId)
+  const mentionedUsers = mentionInputRef?.getMentionedUsers() || []
+  const mentionedUserIds = mentionedUsers.map((u) => u.id).filter(Boolean) as number[]
+
+  console.log('[CommentReplyList] Submitting reply:', {
+    pictureid: props.pictureId,
+    parentid: reply.commentId,
+    content: content,
+    mentionedUsers,
+    mentionedUserIds,
+  })
+
   if (!props.pictureId) {
-    message.error('图片ID不存在')
+    message.error('图片 ID 不存在')
     return
   }
 
   if (!reply.commentId) {
-    message.error('回复ID不存在')
+    message.error('回复 ID 不存在')
     return
   }
 
@@ -186,6 +210,7 @@ const handleSubmitReply = async (reply: API.CommentReplyVO) => {
       pictureid: props.pictureId,
       parentid: reply.commentId,
       content: content,
+      mentionedUserIds,
     })
 
     if (res.data.code === 0) {
@@ -385,3 +410,5 @@ defineExpose({
   color: #1890ff;
 }
 </style>
+
+.reply-input-actions { margin-top: 8px; display: flex; justify-content: flex-end; }

@@ -221,6 +221,7 @@ declare namespace API {
     pictureid?: number
     parentid?: number
     content?: string
+    mentionedUserIds?: number[]
   }
 
   type CommentListVO = {

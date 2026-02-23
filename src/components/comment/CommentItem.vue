@@ -10,7 +10,11 @@
           <span class="user-name">{{ comment.userName }}</span>
           <span class="comment-time">{{ formatTime(comment.createTime) }}</span>
         </div>
-        <div class="comment-text">{{ comment.content }}</div>
+        <MentionDisplay
+          class="comment-text"
+          :content="comment.content"
+          :mentioned-users="comment.mentionedUsers"
+        />
         <div class="comment-actions">
           <a-space>
             <a-button type="text" size="small" @click="handleReply">
@@ -29,27 +33,28 @@
 
     <!-- 回复输入框 -->
     <div v-if="showReplyInput" class="reply-input-container">
-      <a-input
-        v-model:value="replyContent"
+      <MentionInput
+        v-model="replyContent"
+        :friends="friends || []"
         :placeholder="`回复 ${comment.userName}`"
         :maxlength="500"
-        @pressEnter="handleSubmitReply"
-      >
-        <template #suffix>
-          <a-space>
-            <a-button
-              type="primary"
-              size="small"
-              :loading="submitting"
-              :disabled="!replyContent.trim()"
-              @click="handleSubmitReply"
-            >
-              发送
-            </a-button>
-            <a-button size="small" @click="cancelReply"> 取消 </a-button>
-          </a-space>
-        </template>
-      </a-input>
+        :auto-size="{ minRows: 1, maxRows: 1 }"
+        ref="replyMentionRef"
+      />
+      <div class="reply-actions">
+        <a-space>
+          <a-button
+            type="primary"
+            size="small"
+            :loading="submitting"
+            :disabled="!replyContent.trim()"
+            @click="handleSubmitReply"
+          >
+            发送
+          </a-button>
+          <a-button size="small" @click="cancelReply"> 取消 </a-button>
+        </a-space>
+      </div>
     </div>
 
     <!-- 回复预览列表（未展开时显示） -->
@@ -84,6 +89,7 @@
         ref="replyListRef"
         :comment-id="comment.commentId"
         :picture-id="pictureId"
+        :friends="friends"
         @delete-success="handleDeleteSuccess"
         @new-reply-added="handleNewReplyAdded"
       />
@@ -97,6 +103,8 @@ import { message } from 'ant-design-vue'
 import { addComment, listReplyComments } from '@/api/commentController'
 import type { API } from '@/api/typings'
 import CommentReplyList from './CommentReplyList.vue'
+import MentionInput from '@/components/mention/MentionInput.vue'
+import MentionDisplay from '@/components/mention/MentionDisplay.vue'
 import { MessageOutlined } from '@ant-design/icons-vue'
 import { formatTime } from '@/utils'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
@@ -104,6 +112,7 @@ import { useLoginUserStore } from '@/stores/useLoginUserStore'
 interface Props {
   comment: API.CommentListVO
   pictureId: number | string
+  friends?: API.UserVO[]
 }
 
 const props = defineProps<Props>()
@@ -126,6 +135,8 @@ const submitting = ref(false)
 const loadingReplies = ref(false)
 // 回复列表组件引用
 const replyListRef = ref<InstanceType<typeof CommentReplyList> | null>(null)
+// MentionInput ref for reply
+const replyMentionRef = ref<InstanceType<typeof MentionInput> | null>(null)
 
 // 是否显示回复切换按钮
 const showReplyToggle = computed(() => {
@@ -218,21 +229,34 @@ const handleSubmitReply = async () => {
   }
 
   if (!props.pictureId) {
-    message.error('图片ID不存在')
+    message.error('图片 ID 不存在')
     return
   }
 
   if (!props.comment.commentId) {
-    message.error('评论ID不存在')
+    message.error('评论 ID 不存在')
     return
   }
 
   submitting.value = true
   try {
+    // 获取@的用户
+    const mentionedUsers = replyMentionRef.value?.getMentionedUsers() || []
+    const mentionedUserIds = mentionedUsers.map((user) => user.id).filter(Boolean) as number[]
+
+    console.log('[CommentItem] Submitting reply:', {
+      pictureid: props.pictureId,
+      parentid: props.comment.commentId,
+      content: content,
+      mentionedUsers,
+      mentionedUserIds,
+    })
+
     const res = await addComment({
       pictureid: props.pictureId,
       parentid: props.comment.commentId,
       content: content,
+      mentionedUserIds,
     })
 
     if (res.data.code === 0) {
@@ -370,6 +394,12 @@ const handleDeleteSuccess = () => {
   padding: 12px;
   background: #fafafa;
   border-radius: 4px;
+}
+
+.reply-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
 }
 
 .reply-preview-container {

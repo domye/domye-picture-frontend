@@ -2,12 +2,13 @@
   <div class="comment-list-container">
     <!-- 评论输入框 -->
     <a-card class="comment-input-card" :bordered="false">
-      <a-textarea
-        v-model:value="commentContent"
+      <MentionInput
+        v-model="commentContent"
+        :friends="friendList"
         placeholder="写下你的评论..."
         :auto-size="{ minRows: 3, maxRows: 6 }"
         :maxlength="500"
-        show-count
+        ref="mentionInputRef"
       />
       <div class="input-actions">
         <a-button
@@ -30,6 +31,7 @@
             :key="comment.commentId"
             :comment="comment"
             :picture-id="pictureId"
+            :friends="friendList"
             @reply-success="handleReplySuccess"
             @delete-success="handleDeleteSuccess"
             @comment-updated="handleCommentUpdated"
@@ -49,14 +51,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
-import { addComment, listTopComments } from '@/api/commentController'
+import { addComment, listTopComments, getFriends } from '@/api/commentController'
 import type { API } from '@/api/typings'
 import CommentItem from './CommentItem.vue'
+import MentionInput from '@/components/mention/MentionInput.vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 
 const loginUserStore = useLoginUserStore()
+
+// 获取好友列表
+const fetchFriendList = async () => {
+  try {
+    const res = await getFriends()
+    if (res.data.code === 0 && res.data.data) {
+      friendList.value = res.data.data || []
+    }
+  } catch (e: any) {
+    console.error('获取好友列表失败:', e)
+  }
+}
 
 interface Props {
   pictureId: number | string
@@ -66,6 +81,10 @@ const props = defineProps<Props>()
 
 // 评论内容
 const commentContent = ref('')
+// 好友列表
+const friendList = ref<API.UserVO[]>([])
+// MentionInput ref
+const mentionInputRef = ref<InstanceType<typeof MentionInput>>()
 // 评论列表
 const commentList = ref<API.CommentListVO[]>([])
 // 加载状态
@@ -129,15 +148,27 @@ const handleSubmitComment = async () => {
   }
 
   if (!props.pictureId) {
-    message.error('图片ID不存在')
+    message.error('图片 ID 不存在')
     return
   }
 
   submitting.value = true
   try {
+    // 获取@的用户
+    const mentionedUsers = mentionInputRef.value?.getMentionedUsers() || []
+    const mentionedUserIds = mentionedUsers.map((user) => user.id).filter(Boolean) as number[]
+
+    console.log('[CommentList] Submitting comment:', {
+      pictureid: props.pictureId,
+      content: content,
+      mentionedUsers,
+      mentionedUserIds,
+    })
+
     const res = await addComment({
       pictureid: props.pictureId,
       content: content,
+      mentionedUserIds,
     })
 
     if (res.data.code === 0) {
@@ -186,7 +217,7 @@ const handleReplySuccess = () => {
 
 // 删除成功回调
 const handleDeleteSuccess = () => {
-  // 如果当前页只有1条数据且不是第一页，则回到上一页
+  // 如果当前页只有 1 条数据且不是第一页，则回到上一页
   let pageToLoad = current.value
   if (commentList.value.length === 1 && current.value > 1) {
     pageToLoad = current.value - 1
@@ -218,7 +249,10 @@ watch(
   { immediate: true },
 )
 
-// onMounted 不再需要，因为 watch 已经设置了 immediate: true
+// 获取好友列表
+onMounted(() => {
+  fetchFriendList()
+})
 </script>
 
 <style scoped>

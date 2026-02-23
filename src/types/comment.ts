@@ -27,4 +27,5 @@ export interface AddCommentParams {
   pictureId: number | string
   content: string
   parentId?: number | string
+  mentionedUserIds?: number[]
 }
