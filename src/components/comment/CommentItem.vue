@@ -76,7 +76,11 @@
             <span v-if="shouldShowParent(reply)" class="reply-parent">
               回复 <span class="reply-parent-name">@{{ getParentUserName(reply) }}</span>
             </span>
-            <span class="reply-text">：{{ reply.content }}</span>
+            <span class="reply-text">：</span><MentionDisplay
+              class="reply-text"
+              :content="reply.content || ''"
+              :mentioned-users="reply.mentionedUsers"
+            />
             <span class="reply-time">{{ formatTime(reply.createTime) }}</span>
           </div>
         </div>

@@ -18,7 +18,11 @@
               </span>
               <span class="reply-time">{{ formatTime(reply.createTime) }}</span>
             </div>
-            <div class="reply-text">{{ reply.content }}</div>
+            <MentionDisplay
+              class="reply-text"
+              :content="reply.content || ''"
+              :mentioned-users="reply.mentionedUsers"
+            />
             <div class="reply-actions">
               <a-button type="text" size="small" @click="handleReply(reply)">
                 <template #icon>
@@ -83,6 +87,7 @@ import { MessageOutlined } from '@ant-design/icons-vue'
 import { formatTime } from '@/utils'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import MentionInput from '@/components/mention/MentionInput.vue'
+import MentionDisplay from '@/components/mention/MentionDisplay.vue'
 
 interface Props {
   commentId: number | string
