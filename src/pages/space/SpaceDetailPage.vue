@@ -64,10 +64,10 @@
 <script lang="ts" setup>
 import { computed, h, watch } from 'vue'
 import {
-  listPictureVoByPageUsingPost,
-  searchPictureByColorUsingPost,
+  listPictureVoByPage,
+  searchPictureByColor,
 } from '@/api/pictureController'
-import { getSpaceVoByIdUsingGet } from '@/api/spaceController'
+import { getSpaceVoById } from '@/api/spaceController'
 import PictureList from '@/components/picture/PictureList.vue'
 import PictureSearchForm from '@/components/picture/PictureSearchForm.vue'
 import { ColorPicker } from 'vue3-colorpicker'
@@ -86,7 +86,7 @@ const space = ref<API.SpaceVO>({})
 // 获取空间详情
 const fetchSpaceDetail = async () => {
   try {
-    const res = await getSpaceVoByIdUsingGet({
+    const res = await getSpaceVoById({
       id: props.id,
     })
     if (res.data.code === 0 && res.data.data) {
@@ -99,7 +99,7 @@ const fetchSpaceDetail = async () => {
   }
 }
 const onColorChange = async (color: string) => {
-  const res = await searchPictureByColorUsingPost({
+  const res = await searchPictureByColor({
     picColor: color,
     spaceId: props.id,
   })
@@ -171,7 +171,7 @@ const fetchData = async () => {
     spaceId: props.id,
     ...searchParams.value,
   }
-  const res = await listPictureVoByPageUsingPost(params)
+  const res = await listPictureVoByPage(params)
   if (res.data.data) {
     dataList.value = res.data.data.records ?? []
     total.value = res.data.data.total ?? 0

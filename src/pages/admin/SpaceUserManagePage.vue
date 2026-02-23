@@ -13,10 +13,25 @@
       </a-space>
     </a-flex>
     <div style="margin-bottom: 16px" />
-    <!-- 添加成员表单 -->
-    <a-form layout="inline" :model="formData" @finish="handleSubmit">
+    <!-- 管理员: 显示用户ID输入框 -->
+    <a-form v-if="isAdmin" layout="inline" :model="formData" @finish="handleSubmit">
       <a-form-item label="用户 id" name="userId">
         <a-input v-model:value="formData.userId" placeholder="请输入用户 id" allow-clear />
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" html-type="submit">添加用户</a-button>
+      </a-form-item>
+    </a-form>
+
+    <!-- 普通用户: 显示联系人选择器 -->
+    <a-form v-else layout="inline" :model="formData" @finish="handleSubmit">
+      <a-form-item label="选择联系人" name="userId">
+        <a-select v-model:value="formData.userId" placeholder="请选择联系人" style="width: 200px">
+          <a-select-option v-for="contact in contactList" :key="contact.contactUserId" :value="contact.contactUserId">
+            <a-avatar :src="contact.contactUser?.userAvatar" size="small" />
+            {{ contact.contactUser?.userName }}
+          </a-select-option>
+        </a-select>
       </a-form-item>
       <a-form-item>
         <a-button type="primary" html-type="submit">添加用户</a-button>
@@ -52,22 +67,40 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import {
-  addSpaceUserUsingPost,
-  deleteSpaceUserUsingPost,
-  editSpaceUserUsingPost,
-  listSpaceUserUsingPost,
+  addSpaceUser,
+  deleteSpaceUser,
+  editSpaceUser,
+  listSpaceUser,
 } from '@/api/spaceUserController.ts'
 import dayjs from 'dayjs'
 import { SPACE_ROLE_OPTIONS } from '@/constants/space'
+import { useLoginUserStore } from '@/stores/useLoginUserStore'
+import { listContacts } from '@/api/contactController'
 
 interface Props {
   id: string
 }
 
 const props = defineProps<Props>()
+
+const loginUserStore = useLoginUserStore()
+const isAdmin = computed(() => loginUserStore.loginUser.userRole === 'admin')
+
+// 联系人列表
+const contactList = ref<API.ContactVO[]>([])
+
+// 加载联系人
+const fetchContacts = async () => {
+  if (!isAdmin.value) {
+    const res = await listContacts({})
+    if (res.data.code === 0) {
+      contactList.value = res.data.data?.records || []
+    }
+  }
+}
 
 const columns = [
   {
@@ -97,7 +130,7 @@ const fetchData = async () => {
   if (!spaceId) {
     return
   }
-  const res = await listSpaceUserUsingPost({
+  const res = await listSpaceUser({
     spaceId,
   })
   if (res.data.code === 0 && res.data.data) {
@@ -110,6 +143,7 @@ const fetchData = async () => {
 // 页面加载时获取数据，请求一次
 onMounted(() => {
   fetchData()
+  fetchContacts()
 })
 
 // 添加成员表单
@@ -121,7 +155,7 @@ const handleSubmit = async () => {
   if (!spaceId) {
     return
   }
-  const res = await addSpaceUserUsingPost({
+  const res = await addSpaceUser({
     spaceId,
     ...formData,
   })
@@ -136,7 +170,7 @@ const handleSubmit = async () => {
 
 // 编辑成员角色
 const editSpaceRole = async (value, record) => {
-  const res = await editSpaceUserUsingPost({
+  const res = await editSpaceUser({
     id: record.id,
     spaceRole: value,
   })
@@ -152,7 +186,7 @@ const doDelete = async (id: string) => {
   if (!id) {
     return
   }
-  const res = await deleteSpaceUserUsingPost({ id })
+  const res = await deleteSpaceUser({ id })
   if (res.data.code === 0) {
     message.success('删除成功')
     // 刷新数据

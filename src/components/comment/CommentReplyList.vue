@@ -75,7 +75,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import { addCommentUsingPost, listReplyCommentsUsingGet } from '@/api/commentController'
+import { addComment, listReplyComments } from '@/api/commentController'
 import type { API } from '@/api/typings'
 import { MessageOutlined } from '@ant-design/icons-vue'
 import { formatTime } from '@/utils'
@@ -123,7 +123,7 @@ const fetchReplyList = async (page: number = 1, append: boolean = false) => {
       loadingMore.value = true
     }
 
-    const res = await listReplyCommentsUsingGet({
+    const res = await listReplyComments({
       pictureId: props.pictureId,
       commentId: props.commentId,
       current: page,
@@ -182,7 +182,7 @@ const handleSubmitReply = async (reply: API.CommentReplyVO) => {
 
   submitting.value = true
   try {
-    const res = await addCommentUsingPost({
+    const res = await addComment({
       pictureid: props.pictureId,
       parentid: reply.commentId,
       content: content,

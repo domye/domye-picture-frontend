@@ -2,12 +2,9 @@
 /* eslint-disable */
 import request from '@/request'
 
-/** addComment POST /api/comment/add */
-export async function addCommentUsingPost(
-  body: API.CommentAddRequest,
-  options?: { [key: string]: any }
-) {
-  return request<API.BaseResponseLong_>('/api/comment/add', {
+/** 此处后端没有提供注释 POST /comment/add */
+export async function addComment(body: API.CommentAddRequest, options?: { [key: string]: any }) {
+  return request<API.BaseResponseLong>('/comment/add', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -17,31 +14,43 @@ export async function addCommentUsingPost(
   })
 }
 
-/** listTopComments GET /api/comment/list */
-export async function listTopCommentsUsingGet(
+/** 获取好友列表 (用于@选择器) GET /comment/friends */
+export async function getFriends(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListMapStringObject>('/comment/friends', {
+    method: 'GET',
+    ...(options || {}),
+  })
+}
+
+/** 此处后端没有提供注释 GET /comment/list */
+export async function listTopComments(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.listTopCommentsUsingGETParams,
+  params: API.listTopCommentsParams,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponsePageCommentListVO_>('/api/comment/list', {
+  return request<API.BaseResponsePageCommentListVO>('/comment/list', {
     method: 'GET',
     params: {
       ...params,
+      request: undefined,
+      ...params['request'],
     },
     ...(options || {}),
   })
 }
 
-/** listReplyComments GET /api/comment/reply */
-export async function listReplyCommentsUsingGet(
+/** 此处后端没有提供注释 GET /comment/reply */
+export async function listReplyComments(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.listReplyCommentsUsingGETParams,
+  params: API.listReplyCommentsParams,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponsePageCommentListVO_>('/api/comment/reply', {
+  return request<API.BaseResponsePageCommentListVO>('/comment/reply', {
     method: 'GET',
     params: {
       ...params,
+      request: undefined,
+      ...params['request'],
     },
     ...(options || {}),
   })

@@ -30,7 +30,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { userLoginUsingPost } from '@/api/userController'
+import { userLogin } from '@/api/userController'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { message } from 'ant-design-vue'
 import { reactive } from 'vue'
@@ -42,7 +42,7 @@ const formState = reactive<API.UserLoginRequest>({
   userPassword: '',
 })
 const handleSubmit = async (values: any) => {
-  const res = await userLoginUsingPost(values)
+  const res = await userLogin(values)
   // 登录成功，把登录态保存到全局状态中
   if (res.data.code === 0 && res.data.data) {
     await loginUserStore.fetchLoginUser()

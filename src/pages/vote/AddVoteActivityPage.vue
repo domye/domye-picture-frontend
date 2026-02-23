@@ -74,7 +74,7 @@ import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import dayjs from 'dayjs'
-import { addVoteActivitiesUsingPost } from '@/api/voteController'
+import { addVoteActivities } from '@/api/voteController'
 
 const router = useRouter()
 const loading = ref(false)
@@ -139,7 +139,7 @@ const handleSubmit = async () => {
       })),
     }
 
-    const res = await addVoteActivitiesUsingPost(params)
+    const res = await addVoteActivities(params)
 
     if (res.data.code === 0) {
       message.success('创建成功')

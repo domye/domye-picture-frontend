@@ -10,7 +10,7 @@ export const ENV = import.meta.env.MODE || 'development'
  * 基础 URL 配置
  */
 export const BASE_URL = {
-  DEV: 'http://localhost:8123',
+  DEV: 'http://localhost:8123/api',
   PROD: 'https://picture.domye.top',
 }
 

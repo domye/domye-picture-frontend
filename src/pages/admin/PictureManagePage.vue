@@ -202,9 +202,9 @@ import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import { onMounted, reactive, ref } from 'vue'
 import {
-  deletePictureUsingPost,
-  doPictureReviewUsingPost,
-  listPictureByPageUsingPost,
+  deletePicture,
+  doPictureReview,
+  listPictureByPage,
 } from '@/api/pictureController'
 import {
   PIC_REVIEW_STATUS_ENUM,
@@ -306,7 +306,7 @@ const getReviewStatusColor = (status: number) => {
 const handleReview = async (record: API.Picture, reviewStatus: number) => {
   const reviewMessage =
     reviewStatus === PIC_REVIEW_STATUS_ENUM.PASS ? '管理员操作通过' : '管理员操作拒绝'
-  const res = await doPictureReviewUsingPost({
+  const res = await doPictureReview({
     id: record.id,
     reviewStatus,
     reviewMessage,
@@ -367,7 +367,7 @@ const doDelete = async (id: number) => {
   if (!id) {
     return
   }
-  const res = await deletePictureUsingPost({ id })
+  const res = await deletePicture({ id })
   if (res.data.code === 0) {
     message.success('删除成功')
     fetchData()
@@ -378,7 +378,7 @@ const doDelete = async (id: number) => {
 
 // 获取数据
 const fetchData = async () => {
-  const res = await listPictureByPageUsingPost({
+  const res = await listPictureByPage({
     ...searchParams,
   })
   if (res.data.data) {

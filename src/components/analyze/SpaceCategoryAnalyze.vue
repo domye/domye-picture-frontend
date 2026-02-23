@@ -24,7 +24,7 @@
 import VChart from 'vue-echarts'
 import 'echarts'
 import { computed, ref, watchEffect, onMounted, onBeforeUnmount } from 'vue'
-import { getSpaceCategoryAnalyzeUsingPost } from '@/api/spaceAnalyzeController.ts'
+import { getSpaceCategoryAnalyze } from '@/api/spaceAnalyzeController.ts'
 import { message } from 'ant-design-vue'
 import { useWindowSize } from '@vueuse/core'
 import { logger } from '@/utils/logger'
@@ -78,7 +78,7 @@ const legendData = computed(() => {
 const fetchData = async () => {
   loading.value = true
   try {
-    const res = await getSpaceCategoryAnalyzeUsingPost({
+    const res = await getSpaceCategoryAnalyze({
       queryAll: props.queryAll,
       queryPublic: props.queryPublic,
       spaceId: props.spaceId,

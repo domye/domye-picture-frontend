@@ -38,7 +38,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { userRegisterUsingPost } from '@/api/userController'
+import { userRegister } from '@/api/userController'
 import { message } from 'ant-design-vue'
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
@@ -54,7 +54,7 @@ const handleSubmit = async (values: any) => {
     message.error('二次输入的密码不一致')
     return
   }
-  const res = await userRegisterUsingPost(values)
+  const res = await userRegister(values)
   // 注册成功，跳转到登录页面
   if (res.data.code === 0 && res.data.data) {
     message.success('注册成功')

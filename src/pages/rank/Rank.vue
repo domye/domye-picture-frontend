@@ -26,7 +26,7 @@
 <script lang="ts" setup="">
 import { onMounted, ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import { getUserActivityScoreUsingGet } from '@/api/rankController'
+import { getUserActivityScore } from '@/api/rankController'
 
 // 定义表格列
 const columns = [
@@ -62,7 +62,7 @@ watch(period, async (newPeriod) => {
 
 const fetchData = async (period: number) => {
   try {
-    const res = await getUserActivityScoreUsingGet(params)
+    const res = await getUserActivityScore(params)
     if (res.data.code === 0) {
       rankList.value = res.data.data
     } else {

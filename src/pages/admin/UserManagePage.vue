@@ -73,11 +73,11 @@
 
 <script lang="ts" setup>
 import dayjs from 'dayjs'
-import { deleteUserUsingPost, listUserVoByPageUsingPost } from '@/api/userController'
+import { deleteUser, listUserVoByPage } from '@/api/userController'
 import {
-  addFilterListUsingPost,
-  removeFilterListUsingPost,
-  getFilterListUsingGet,
+  addFilterList,
+  removeFilterList,
+  getFilterList,
 } from '@/api/filterListController'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref } from 'vue'
@@ -144,7 +144,7 @@ const columns = [
 
 // 添加到黑名单
 const handleAddToBlacklist = async (userId: number) => {
-  const res = await addFilterListUsingPost({
+  const res = await addFilterList({
     userId,
     type: 0,
     mode: 0,
@@ -159,7 +159,7 @@ const handleAddToBlacklist = async (userId: number) => {
 
 // 从黑名单移除
 const handleRemoveFromBlacklist = async (userId: number) => {
-  const res = await removeFilterListUsingPost({
+  const res = await removeFilterList({
     userId,
     mode: 0,
     type: 0,
@@ -174,7 +174,7 @@ const handleRemoveFromBlacklist = async (userId: number) => {
 
 // 添加到白名单
 const handleAddToWhitelist = async (userId: number) => {
-  const res = await addFilterListUsingPost({
+  const res = await addFilterList({
     userId,
     type: 0,
     mode: 1,
@@ -189,7 +189,7 @@ const handleAddToWhitelist = async (userId: number) => {
 
 // 从白名单移除
 const handleRemoveFromWhitelist = async (userId: number) => {
-  const res = await removeFilterListUsingPost({
+  const res = await removeFilterList({
     userId,
     type: 0,
     mode: 1,
@@ -229,7 +229,7 @@ const doDelete = async (id: number) => {
   if (!id) {
     return
   }
-  const res = await deleteUserUsingPost({ id })
+  const res = await deleteUser({ id })
   if (res.data.code === 0) {
     message.success('删除成功')
     fetchData()
@@ -240,7 +240,7 @@ const doDelete = async (id: number) => {
 
 // 获取数据
 const fetchData = async () => {
-  const res = await listUserVoByPageUsingPost({
+  const res = await listUserVoByPage({
     ...searchParams,
   })
   if (res.data.data) {

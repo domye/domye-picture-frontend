@@ -131,7 +131,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import { deletePictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController'
+import { deletePicture, getPictureVoById } from '@/api/pictureController'
 import type { API } from '@/api/typings'
 import router from '@/router'
 import { SPACE_PERMISSION_ENUM } from '@/constants/space'
@@ -147,7 +147,7 @@ const doDelete = async () => {
   if (!id) {
     return
   }
-  const res = await deletePictureUsingPost({ id })
+  const res = await deletePicture({ id })
   if (res.data.code === 0) {
     message.success('删除成功')
   } else {
@@ -172,7 +172,7 @@ const fetchPictureDetail = async () => {
 
   loading.value = true
   try {
-    const res = await getPictureVoByIdUsingGet({
+    const res = await getPictureVoById({
       id: props.id,
     })
     if (res.data.code === 0 && res.data.data) {

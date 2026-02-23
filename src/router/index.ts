@@ -7,7 +7,6 @@ const Rank = () => import('@/pages/rank/Rank.vue')
 // 用户相关页面
 const UserLoginPage = () => import('@/pages/user/UserLoginPage.vue')
 const UserRegisterPage = () => import('@/pages/user/UserRegisterPage.vue')
-const UpdateUserPage = () => import('@/pages/user/UpdateUserPage.vue')
 
 // 空间相关页面
 const MySpacePage = () => import('@/pages/space/MySpace.vue')
@@ -30,6 +29,7 @@ const PictureManagePage = () => import('@/pages/admin/PictureManagePage.vue')
 const SpaceManagePage = () => import('@/pages/admin/SpaceManagePage.vue')
 const SpaceUserManagePage = () => import('@/pages/admin/SpaceUserManagePage.vue')
 const VoteManagePage = () => import('@/pages/admin/VoteManagePage.vue')
+const ContactManagePage = () => import('@/pages/admin/ContactManagePage.vue')
 
 // 404 页面
 const NotFoundPage = () => import('@/pages/NotFoundPage.vue')
@@ -111,11 +111,17 @@ const router = createRouter({
     {
       path: '/vote/detail/:id',
       name: '投票详情',
+
       component: VoteDetailPage,
       props: true,
     },
-
+    {
+      path: '/contactManage',
+      name: '联系人管理',
+      component: ContactManagePage,
+    },
     // 管理员相关路由
+
     {
       path: '/admin/userManage',
       name: '用户管理',
@@ -131,6 +137,7 @@ const router = createRouter({
       name: '空间管理',
       component: SpaceManagePage,
     },
+
     {
       path: '/admin/voteManage',
       name: '投票管理',

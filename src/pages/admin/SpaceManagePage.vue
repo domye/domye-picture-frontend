@@ -122,9 +122,9 @@ import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { formatSize } from '@/utils'
 import {
-  deleteSpaceUsingPost,
-  listSpaceByPageUsingPost,
-  listSpaceLevelUsingGet,
+  deleteSpace,
+  listSpaceByPage,
+  listSpaceLevel,
 } from '@/api/spaceController'
 import { SPACE_LEVEL_MAP, SPACE_TYPE_MAP } from '@/constants/space'
 // 数据
@@ -213,7 +213,7 @@ const doDelete = async (id: number) => {
   if (!id) {
     return
   }
-  const res = await deleteSpaceUsingPost({ id })
+  const res = await deleteSpace({ id })
   if (res.data.code === 0) {
     message.success('删除成功')
     fetchData()
@@ -224,7 +224,7 @@ const doDelete = async (id: number) => {
 
 // 获取数据
 const fetchData = async () => {
-  const res = await listSpaceByPageUsingPost({
+  const res = await listSpaceByPage({
     ...searchParams,
   })
   if (res.data.data) {
@@ -243,7 +243,7 @@ const doSearch = () => {
 
 // 获取标签分类
 const getSpaceLevelOptions = async () => {
-  const res = await listSpaceLevelUsingGet()
+  const res = await listSpaceLevel()
   if (res.data.code === 0 && res.data.data) {
     SPACE_LEVEL_OPTIONS.value = res.data.data.map((data) => {
       return {

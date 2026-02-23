@@ -1,5 +1,5 @@
 import { ref, onMounted, type Ref } from 'vue'
-import { listPictureTagCategoryUsingGet } from '@/api/pictureController'
+import { listPictureTagCategory } from '@/api/pictureController'
 
 export interface UseTagCategoriesReturn {
   /** 标签列表 */
@@ -45,7 +45,7 @@ export function useTagCategories(): UseTagCategoriesReturn {
 
     loading.value = true
     try {
-      const res = await listPictureTagCategoryUsingGet()
+      const res = await listPictureTagCategory()
       if (res.data.code === 0 && res.data.data) {
         const rawTagList = res.data.data.tagList ?? []
         const rawCategoryList = res.data.data.categoryList ?? []

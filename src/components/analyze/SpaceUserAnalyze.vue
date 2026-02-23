@@ -16,7 +16,7 @@
 import VChart from 'vue-echarts'
 import 'echarts'
 import { computed, ref, watchEffect } from 'vue'
-import { getSpaceUserAnalyzeUsingPost } from '@/api/spaceAnalyzeController.ts'
+import { getSpaceUserAnalyze } from '@/api/spaceAnalyzeController.ts'
 import { message } from 'ant-design-vue'
 
 interface Props {
@@ -62,7 +62,7 @@ const loading = ref(true)
 const fetchData = async () => {
   loading.value = true
   // 转换搜索参数
-  const res = await getSpaceUserAnalyzeUsingPost({
+  const res = await getSpaceUserAnalyze({
     queryAll: props.queryAll,
     queryPublic: props.queryPublic,
     spaceId: props.spaceId,

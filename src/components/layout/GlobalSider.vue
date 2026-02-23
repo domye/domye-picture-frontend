@@ -16,9 +16,9 @@
 // 导入必要的模块和组件
 import { computed, h, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
-import { UserOutlined, PictureOutlined, TeamOutlined } from '@ant-design/icons-vue'
+import { UserOutlined, PictureOutlined, TeamOutlined, ContactsOutlined } from '@ant-design/icons-vue'
 import { SPACE_TYPE_ENUM } from '@/constants/space'
-import { listMyTeamSpaceUsingPost } from '@/api/spaceUserController'
+import { listMyTeamSpace } from '@/api/spaceUserController'
 import { message } from 'ant-design-vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 const loginUserStore = useLoginUserStore()
@@ -44,6 +44,12 @@ const fixedMenuItems = [
     label: '创建团队',
     icon: () => h(TeamOutlined),
   },
+  {
+    key: '/contactManage',
+    label: '联系人管理',
+    icon: () => h(TeamOutlined),
+  },
+
 ]
 
 const teamSpaceList = ref<API.SpaceUserVO[]>([])
@@ -76,7 +82,7 @@ const fetchTeamSpaceList = async () => {
   // 防止重复请求
   if (teamSpaceLoaded.value) return
 
-  const res = await listMyTeamSpaceUsingPost()
+  const res = await listMyTeamSpace()
   if (res.data.code === 0 && res.data.data) {
     teamSpaceList.value = res.data.data
     teamSpaceLoaded.value = true

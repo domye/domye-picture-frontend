@@ -39,10 +39,10 @@
 
 <script lang="ts" setup>
 import {
-  addSpaceUsingPost,
-  getSpaceVoByIdUsingGet,
-  listSpaceLevelUsingGet,
-  updateSpaceUsingPost,
+  addSpace,
+  getSpaceVoById,
+  listSpaceLevel,
+  updateSpace,
 } from '@/api/spaceController'
 import {
   SPACE_LEVEL_ENUM,
@@ -80,7 +80,7 @@ const getOldSpace = async () => {
   // 获取数据
   const id = route.query?.id
   if (id) {
-    const res = await getSpaceVoByIdUsingGet({
+    const res = await getSpaceVoById({
       id: id,
     })
     if (res.data.code === 0 && res.data.data) {
@@ -99,13 +99,13 @@ const handleSubmit = async (values: any) => {
   let res
   // 更新
   if (spaceId) {
-    res = await updateSpaceUsingPost({
+    res = await updateSpace({
       id: spaceId,
       ...formData,
     })
   } else {
     // 创建
-    res = await addSpaceUsingPost({
+    res = await addSpace({
       ...formData,
       spaceType: spaceType.value,
     })
@@ -124,7 +124,7 @@ const handleSubmit = async (values: any) => {
 
 // 获取标签分类
 const getSpaceLevelOptions = async () => {
-  const res = await listSpaceLevelUsingGet()
+  const res = await listSpaceLevel()
   if (res.data.code === 0 && res.data.data) {
     spaceLevelList.value = res.data.data
     SPACE_LEVEL_OPTIONS.value = res.data.data.map((data) => {

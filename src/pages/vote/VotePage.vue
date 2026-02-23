@@ -91,7 +91,7 @@ import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { EditOutlined, EyeOutlined, DeleteOutlined, CalendarOutlined } from '@ant-design/icons-vue'
-import { listVoteActivitiesVoByPageUsingPost } from '@/api/voteController'
+import { listVoteActivitiesVoByPage, deleteVoteActivities } from '@/api/voteController'
 
 const router = useRouter()
 
@@ -158,7 +158,7 @@ const resetSearch = () => {
 const fetchData = async () => {
   loading.value = true
   try {
-    const res = await listVoteActivitiesVoByPageUsingPost(searchParams.value)
+    const res = await listVoteActivitiesVoByPage(searchParams.value)
     if (res.data.data) {
       dataList.value = res.data.data.records ?? []
       total.value = res.data.data.total ?? 0
@@ -190,7 +190,7 @@ const handleView = (record: any) => {
 // 删除活动
 const handleDelete = async (record: any) => {
   try {
-    const res = await deleteVoteActivityUsingPost({ id: record.id })
+    const res = await deleteVoteActivities({ id: record.id })
     if (res.data.code === 0) {
       message.success('删除成功')
       fetchData()

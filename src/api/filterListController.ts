@@ -2,12 +2,9 @@
 /* eslint-disable */
 import request from '@/request'
 
-/** addFilterList POST /api/filterList/add */
-export async function addFilterListUsingPost(
-  body: API.FilterListRequest,
-  options?: { [key: string]: any }
-) {
-  return request<API.BaseResponseString_>('/api/filterList/add', {
+/** 此处后端没有提供注释 POST /filterList/add */
+export async function addFilterList(body: API.FilterListRequest, options?: { [key: string]: any }) {
+  return request<API.BaseResponseString>('/filterList/add', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -17,27 +14,29 @@ export async function addFilterListUsingPost(
   })
 }
 
-/** getFilterList GET /api/filterList/list */
-export async function getFilterListUsingGet(
+/** 此处后端没有提供注释 GET /filterList/list */
+export async function getFilterList(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getFilterListUsingGETParams,
+  params: API.getFilterListParams,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseListUserVO_>('/api/filterList/list', {
+  return request<API.BaseResponseListUserVO>('/filterList/list', {
     method: 'GET',
     params: {
       ...params,
+      request: undefined,
+      ...params['request'],
     },
     ...(options || {}),
   })
 }
 
-/** removeFilterList POST /api/filterList/remove */
-export async function removeFilterListUsingPost(
+/** 此处后端没有提供注释 POST /filterList/remove */
+export async function removeFilterList(
   body: API.FilterListRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseString_>('/api/filterList/remove', {
+  return request<API.BaseResponseString>('/filterList/remove', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

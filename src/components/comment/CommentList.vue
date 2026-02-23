@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import { addCommentUsingPost, listTopCommentsUsingGet } from '@/api/commentController'
+import { addComment, listTopComments } from '@/api/commentController'
 import type { API } from '@/api/typings'
 import CommentItem from './CommentItem.vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
@@ -90,7 +90,7 @@ const fetchCommentList = async (page: number = 1, append: boolean = false) => {
       loadingMore.value = true
     }
 
-    const res = await listTopCommentsUsingGet({
+    const res = await listTopComments({
       pictureId: props.pictureId,
       current: page,
       pageSize: pageSize.value,
@@ -135,7 +135,7 @@ const handleSubmitComment = async () => {
 
   submitting.value = true
   try {
-    const res = await addCommentUsingPost({
+    const res = await addComment({
       pictureid: props.pictureId,
       content: content,
     })

@@ -58,9 +58,9 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import {
-  getVoteActivitiesUsingGet,
-  addVoteRecordUsingPost,
-  endVoteActivitiesUsingPost,
+  getVoteActivities,
+  addVoteRecord,
+  endVoteActivities,
 } from '@/api/voteController'
 import type { API } from '@/api/typings'
 import router from '@/router'
@@ -81,7 +81,7 @@ const fetchVoteDetail = async () => {
 
   loading.value = true
   try {
-    const res = await getVoteActivitiesUsingGet({ id: props.id })
+    const res = await getVoteActivities({ id: props.id })
     if (res.data.code === 0 && res.data.data) {
       voteActivity.value = res.data.data
       hasVoted.value = res.data.data.hasVoted || false
@@ -103,7 +103,7 @@ const handleVote = async () => {
   }
 
   try {
-    const res = await addVoteRecordUsingPost({
+    const res = await addVoteRecord({
       activityId: props.id,
       optionId: selectedOption.value,
     })
@@ -132,7 +132,7 @@ const getVotePercent = (voteCount: number) => {
 // 结束投票
 const doEnd = async () => {
   try {
-    const res = await endVoteActivitiesUsingPost({ activityId: props.id })
+    const res = await endVoteActivities({ activityId: props.id })
     if (res.data.code === 0) {
       message.success('已结束投票')
       fetchVoteDetail()

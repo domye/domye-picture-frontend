@@ -68,14 +68,14 @@
 </template>
 
 <script lang="ts" setup>
-import { editPictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController'
+import { editPicture, getPictureVoById } from '@/api/pictureController'
 import PictureUpload from '@/components/picture/PictureUpload.vue'
 import router from '@/router'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import ImageCropper from '@/components/picture/ImageCropper.vue'
-import { getSpaceVoByIdUsingGet } from '@/api/spaceController'
+import { getSpaceVoById } from '@/api/spaceController'
 import { useTagCategories } from '@/composables'
 
 const route = useRoute()
@@ -97,7 +97,7 @@ const getOldPicture = async () => {
   // 获取数据
   const id = route.query?.id
   if (id) {
-    const res = await getPictureVoByIdUsingGet({
+    const res = await getPictureVoById({
       id: id,
     })
     if (res.data.code === 0 && res.data.data) {
@@ -127,7 +127,7 @@ const handleSubmit = async (values: any) => {
   if (!pictureId) {
     return
   }
-  const res = await editPictureUsingPost({
+  const res = await editPicture({
     id: pictureId,
     spaceId: spaceId.value,
     ...values,
@@ -157,7 +157,7 @@ const space = ref<API.SpaceVO>()
 const fetchSpace = async () => {
   // 获取数据
   if (spaceId.value) {
-    const res = await getSpaceVoByIdUsingGet({
+    const res = await getSpaceVoById({
       id: spaceId.value,
     })
     if (res.data.code === 0 && res.data.data) {

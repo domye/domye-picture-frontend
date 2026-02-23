@@ -49,11 +49,11 @@
 
 <script lang="ts" setup>
 import dayjs from 'dayjs'
-import { deleteUserUsingPost } from '@/api/userController'
+import { deleteUser } from '@/api/userController'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { DownOutlined } from '@ant-design/icons-vue'
-import { listVoteActivitiesVoByPageUsingPost } from '@/api/voteController'
+import { listVoteActivitiesVoByPage } from '@/api/voteController'
 
 // 数据
 const dataList = ref<API.VoteActivityVO[]>([])
@@ -124,7 +124,7 @@ const doDelete = async (id: number) => {
   if (!id) {
     return
   }
-  const res = await deleteUserUsingPost({ id })
+  const res = await deleteUser({ id })
   if (res.data.code === 0) {
     message.success('删除成功')
     fetchData()
@@ -135,7 +135,7 @@ const doDelete = async (id: number) => {
 
 // 获取数据
 const fetchData = async () => {
-  const res = await listVoteActivitiesVoByPageUsingPost({
+  const res = await listVoteActivitiesVoByPage({
     ...searchParams,
   })
   if (res.data.data) {

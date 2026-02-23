@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { deletePictureUsingPost } from '@/api/pictureController'
+import { deletePicture } from '@/api/pictureController'
 import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 
@@ -96,7 +96,7 @@ const doDelete = async (picture: API.PictureVO, e: Event) => {
   if (!id) {
     return
   }
-  const res = await deletePictureUsingPost({ id })
+  const res = await deletePicture({ id })
   if (res.data.code === 0) {
     message.success('删除成功')
     // 让外层刷新
