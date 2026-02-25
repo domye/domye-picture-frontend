@@ -61,15 +61,25 @@ import { useLoginUserStore } from '@/stores/useLoginUserStore'
 
 const loginUserStore = useLoginUserStore()
 
+// AI 助手常量
+const AI_ASSISTANT: API.UserVO = {
+  id: '2020004031158120450',
+  userName: 'AI助手',
+  userAvatar: '',
+  userProfile: '智能AI助手，为您解答问题',
+}
+
 // 获取好友列表
 const fetchFriendList = async () => {
   try {
     const res = await getFriends()
     if (res.data.code === 0 && res.data.data) {
-      friendList.value = res.data.data || []
+      // 将 AI 助手添加到好友列表开头
+      friendList.value = [AI_ASSISTANT, ...(res.data.data || [])]
     }
   } catch (e: any) {
-    console.error('获取好友列表失败:', e)
+    // 即使获取好友失败，也要显示 AI 助手
+    friendList.value = [AI_ASSISTANT]
   }
 }
 

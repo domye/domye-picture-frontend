@@ -19,12 +19,20 @@
           v-for="(friend, index) in filteredFriends"
           :key="friend.id"
           class="mention-selector-item"
-          :class="{ active: selectedIndex === index }"
+          :class="{ active: selectedIndex === index, 'is-ai': isAIAssistant(friend) }"
           @click="selectFriend(friend)"
           @mouseenter="selectedIndex = index"
         >
-          <a-avatar :src="friend.userAvatar" :size="24" />
-          <span class="friend-name">{{ friend.userName }}</span>
+          <div class="avatar-wrapper">
+            <a-avatar :src="friend.userAvatar" :size="24">
+              {{ isAIAssistant(friend) ? 'AI' : friend.userName?.charAt(0) }}
+            </a-avatar>
+            <span v-if="isAIAssistant(friend)" class="ai-badge">AI</span>
+          </div>
+          <div class="friend-info">
+            <span class="friend-name">{{ friend.userName }}</span>
+            <span v-if="isAIAssistant(friend)" class="friend-tag">智能助手</span>
+          </div>
         </div>
         <div v-if="filteredFriends.length === 0" class="mention-selector-empty">没有找到好友</div>
       </div>
@@ -90,6 +98,14 @@ const getTextareaElement = (): HTMLTextAreaElement | null => {
     if (textarea) return textarea
   }
   return null
+}
+
+// AI 助手 ID
+const AI_ASSISTANT_ID = '2020004031158120450'
+
+// 判断是否为 AI 助手
+const isAIAssistant = (user: UserVO): boolean => {
+  return String(user.id) === AI_ASSISTANT_ID
 }
 const filteredFriends = computed(() => {
   if (!currentMentionText.value) {
@@ -330,12 +346,53 @@ onUnmounted(() => {
   background: linear-gradient(90deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
 }
 
+.mention-selector-item.is-ai {
+  background: linear-gradient(90deg, rgba(24, 144, 255, 0.05) 0%, rgba(82, 196, 26, 0.05) 100%);
+}
+
+.mention-selector-item.is-ai:hover,
+.mention-selector-item.is-ai.active {
+  background: linear-gradient(90deg, rgba(24, 144, 255, 0.12) 0%, rgba(82, 196, 26, 0.12) 100%);
+}
+
+.avatar-wrapper {
+  position: relative;
+}
+
+.ai-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: linear-gradient(135deg, #1890ff 0%, #52c41a 100%);
+  color: #fff;
+  font-size: 10px;
+  padding: 1px 3px;
+  border-radius: 4px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.friend-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .mention-selector-item .friend-name {
   font-size: 14px;
   color: #262626;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.friend-tag {
+  font-size: 12px;
+  color: #52c41a;
+  background: rgba(82, 196, 26, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+  display: inline-block;
 }
 
 .mention-selector-empty {
