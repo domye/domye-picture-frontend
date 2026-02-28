@@ -3,10 +3,6 @@ declare namespace API {
     spaceAddRequest: SpaceAddRequest
   }
 
-  type AiChatRequest = {
-    message?: string
-  }
-
   type BaseResponseBoolean = {
     code?: number
     data?: boolean
@@ -221,7 +217,6 @@ declare namespace API {
     pictureid?: number
     parentid?: number
     content?: string
-    mentionedUserIds?: number[]
   }
 
   type CommentListVO = {
@@ -877,8 +872,8 @@ declare namespace API {
     description?: string
     maxVotesPerUser?: number
     options?: VoteOptionAddRequest[]
-    startTime?: string
     endTime?: string
+    startTime?: string
   }
 
   type VoteActivityDeleteRequest = {
