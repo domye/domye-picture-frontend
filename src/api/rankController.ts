@@ -2,6 +2,14 @@
 /* eslint-disable */
 import request from '@/request'
 
+/** 获取我的排名 GET /rank/myRank */
+export async function getMyRank(options?: { [key: string]: any }) {
+  return request<API.BaseResponseUserRankVO>('/rank/myRank', {
+    method: 'GET',
+    ...(options || {}),
+  })
+}
+
 /** 获取用户活跃排行榜 GET /rank/UserActivityScore */
 export async function getUserActivityScore(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)

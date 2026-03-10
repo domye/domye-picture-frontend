@@ -9,6 +9,7 @@ import * as spaceController from './spaceController'
 import * as spaceAnalyzeController from './spaceAnalyzeController'
 import * as pictureController from './pictureController'
 import * as filterListController from './filterListController'
+import * as feedController from './feedController'
 import * as contactController from './contactController'
 import * as commentController from './commentController'
 import * as rankController from './rankController'
@@ -20,6 +21,7 @@ export default {
   spaceAnalyzeController,
   pictureController,
   filterListController,
+  feedController,
   contactController,
   commentController,
   rankController,

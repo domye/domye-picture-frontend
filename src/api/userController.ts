@@ -31,7 +31,7 @@ export async function getUserById(
 
 /** 获取当前登录用户信息 GET /user/get/login */
 export async function getLoginUser(options?: { [key: string]: any }) {
-  return request<API.BaseResponseLoginUserVO>('/user/get/login', {
+  return request<API.BaseResponseUserVO>('/user/get/login', {
     method: 'GET',
     ...(options || {}),
   })
@@ -69,7 +69,7 @@ export async function listUserVoByPage(
 
 /** 用户登录 POST /user/login */
 export async function userLogin(body: API.UserLoginRequest, options?: { [key: string]: any }) {
-  return request<API.BaseResponseLoginUserVO>('/user/login', {
+  return request<API.BaseResponseUserVO>('/user/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

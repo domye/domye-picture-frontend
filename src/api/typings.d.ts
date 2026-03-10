@@ -9,6 +9,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseFeedVO = {
+    code?: number
+    data?: FeedVO
+    message?: string
+  }
+
   type BaseResponseListMapStringObject = {
     code?: number
     data?: Record<string, any>[]
@@ -72,12 +78,6 @@ declare namespace API {
   type BaseResponseListUserVO = {
     code?: number
     data?: UserVO[]
-    message?: string
-  }
-
-  type BaseResponseLoginUserVO = {
-    code?: number
-    data?: LoginUserVO
     message?: string
   }
 
@@ -201,6 +201,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseUserRankVO = {
+    code?: number
+    data?: UserRankVO
+    message?: string
+  }
+
   type BaseResponseUserVO = {
     code?: number
     data?: UserVO
@@ -301,6 +307,19 @@ declare namespace API {
     id?: number
   }
 
+  type FeedQueryRequest = {
+    type?: number
+    cursor?: string
+    size?: number
+    typeEnum?: 'FOLLOW' | 'RECOMMEND' | 'LATEST'
+  }
+
+  type FeedVO = {
+    records?: PictureVO[]
+    nextCursor?: string
+    hasMore?: boolean
+  }
+
   type FilterListRequest = {
     userId?: number
     type?: number
@@ -349,18 +368,6 @@ declare namespace API {
 
   type listTopCommentsParams = {
     request: CommentQueryRequest
-  }
-
-  type LoginUserVO = {
-    id?: number
-    userAccount?: string
-    userName?: string
-    userAvatar?: string
-    userProfile?: string
-    userRole?: string
-    editTime?: string
-    createTime?: string
-    updateTime?: string
   }
 
   type OrderItem = {
@@ -518,6 +525,7 @@ declare namespace API {
     updateTime?: string
     isDelete?: number
     spaceId?: number
+    hotScore?: number
   }
 
   type PictureEditRequest = {
@@ -827,6 +835,11 @@ declare namespace API {
     userAccount?: string
     userProfile?: string
     userRole?: string
+  }
+
+  type UserRankVO = {
+    userId?: number
+    ranks?: Record<string, any>
   }
 
   type UserRegisterRequest = {
