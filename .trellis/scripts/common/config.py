@@ -50,3 +50,23 @@ def get_max_journal_lines(repo_root: Path | None = None) -> int:
         return int(value)
     except (ValueError, TypeError):
         return DEFAULT_MAX_JOURNAL_LINES
+
+
+def get_hooks(event: str, repo_root: Path | None = None) -> list[str]:
+    """Get hook commands for a lifecycle event.
+
+    Args:
+        event: Event name (e.g. "after_create", "after_archive").
+        repo_root: Repository root path.
+
+    Returns:
+        List of shell commands to execute, empty if none configured.
+    """
+    config = _load_config(repo_root)
+    hooks = config.get("hooks")
+    if not isinstance(hooks, dict):
+        return []
+    commands = hooks.get(event)
+    if isinstance(commands, list):
+        return [str(c) for c in commands]
+    return []

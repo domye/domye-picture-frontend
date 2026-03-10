@@ -387,6 +387,19 @@ Here's my understanding of the complete requirements:
 Does this look correct? If yes, I'll proceed with implementation.
 ```
 
+### Subtask Decomposition (Complex Tasks)
+
+For complex tasks with multiple independent work items, create subtasks:
+
+```bash
+# Create child tasks
+CHILD1=$(python3 ./.trellis/scripts/task.py create "Child task 1" --slug child1 --parent "$TASK_DIR")
+CHILD2=$(python3 ./.trellis/scripts/task.py create "Child task 2" --slug child2 --parent "$TASK_DIR")
+
+# Or link existing tasks
+python3 ./.trellis/scripts/task.py add-subtask "$TASK_DIR" "$CHILD_DIR"
+```
+
 ---
 
 ## PRD Target Structure (final)

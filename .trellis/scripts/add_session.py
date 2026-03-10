@@ -10,17 +10,6 @@ Usage:
 
 from __future__ import annotations
 
-import sys
-
-# IMPORTANT: Force stdout to use UTF-8 on Windows
-# This fixes UnicodeEncodeError when outputting non-ASCII characters
-if sys.platform == "win32":
-    import io as _io
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
-    elif hasattr(sys.stdout, "detach"):
-        sys.stdout = _io.TextIOWrapper(sys.stdout.detach(), encoding="utf-8", errors="replace")  # type: ignore[union-attr]
-
 import argparse
 import re
 import subprocess
@@ -283,16 +272,16 @@ def update_index(
 # =============================================================================
 
 def _auto_commit_workspace(repo_root: Path) -> None:
-    """Stage .trellis/workspace and commit with a configured message."""
+    """Stage .trellis/workspace and .trellis/tasks, then commit with a configured message."""
     commit_msg = get_session_commit_message(repo_root)
     subprocess.run(
-        ["git", "add", "-A", ".trellis/workspace"],
+        ["git", "add", "-A", ".trellis/workspace", ".trellis/tasks"],
         cwd=repo_root,
         capture_output=True,
     )
     # Check if there are staged changes
     result = subprocess.run(
-        ["git", "diff", "--cached", "--quiet", "--", ".trellis/workspace"],
+        ["git", "diff", "--cached", "--quiet", "--", ".trellis/workspace", ".trellis/tasks"],
         cwd=repo_root,
     )
     if result.returncode == 0:

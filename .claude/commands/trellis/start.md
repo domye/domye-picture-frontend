@@ -119,6 +119,10 @@ See `/trellis:brainstorm` for the full process. Summary:
 5. **Confirm final requirements** - Get explicit approval
 6. **Proceed to Task Workflow** - With clear requirements in PRD
 
+> **Subtask Decomposition**: If brainstorm reveals multiple independent work items,
+> consider creating subtasks using `--parent` flag or `add-subtask` command.
+> See `/trellis:brainstorm` Step 8 for details.
+
 ### Key Brainstorm Principles
 
 | Principle | Description |
