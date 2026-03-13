@@ -165,6 +165,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseS3UploadResultVO = {
+    code?: number
+    data?: S3UploadResultVO
+    message?: string
+  }
+
   type BaseResponseSpace = {
     code?: number
     data?: Space
@@ -301,6 +307,10 @@ declare namespace API {
     status?: number
     createTime?: string
     contactUser?: UserVO
+  }
+
+  type deleteFileParams = {
+    objectKey: string
   }
 
   type DeleteRequest = {
@@ -610,6 +620,19 @@ declare namespace API {
     permissionList?: string[]
   }
 
+  type S3UploadRequest = {
+    pathPrefix?: string
+    fileName?: string
+  }
+
+  type S3UploadResultVO = {
+    url?: string
+    fileName?: string
+    fileSize?: number
+    contentType?: string
+    objectKey?: string
+  }
+
   type SearchPictureByColorRequest = {
     picColor?: string
     spaceId?: number
@@ -788,6 +811,10 @@ declare namespace API {
     editTime?: string
     updateTime?: string
     permissionList?: string[]
+  }
+
+  type uploadFileParams = {
+    request: S3UploadRequest
   }
 
   type uploadPictureParams = {

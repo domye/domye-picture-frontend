@@ -7,6 +7,7 @@ import * as userController from './userController'
 import * as spaceUserController from './spaceUserController'
 import * as spaceController from './spaceController'
 import * as spaceAnalyzeController from './spaceAnalyzeController'
+import * as s3Controller from './s3Controller'
 import * as pictureController from './pictureController'
 import * as filterListController from './filterListController'
 import * as feedController from './feedController'
@@ -19,6 +20,7 @@ export default {
   spaceUserController,
   spaceController,
   spaceAnalyzeController,
+  s3Controller,
   pictureController,
   filterListController,
   feedController,
