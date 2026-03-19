@@ -9,9 +9,27 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseChatSession = {
+    code?: number
+    data?: ChatSession
+    message?: string
+  }
+
   type BaseResponseFeedVO = {
     code?: number
     data?: FeedVO
+    message?: string
+  }
+
+  type BaseResponseListChatMessage = {
+    code?: number
+    data?: ChatMessage[]
+    message?: string
+  }
+
+  type BaseResponseListChatSession = {
+    code?: number
+    data?: ChatSession[]
     message?: string
   }
 
@@ -165,12 +183,6 @@ declare namespace API {
     message?: string
   }
 
-  type BaseResponseS3UploadResultVO = {
-    code?: number
-    data?: S3UploadResultVO
-    message?: string
-  }
-
   type BaseResponseSpace = {
     code?: number
     data?: Space
@@ -201,6 +213,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseSyncEmbeddingResult = {
+    code?: number
+    data?: SyncEmbeddingResult
+    message?: string
+  }
+
   type BaseResponseUser = {
     code?: number
     data?: User
@@ -223,6 +241,39 @@ declare namespace API {
     code?: number
     data?: VoteActivityDetailVO
     message?: string
+  }
+
+  type ChatMessage = {
+    id?: string
+    sessionId?: string
+    role?: string
+    content?: string
+    createTime?: string
+  }
+
+  type ChatSession = {
+    id?: string
+    userId?: number
+    title?: string
+    spaceId?: number
+    createTime?: string
+    updateTime?: string
+    messageCount?: number
+  }
+
+  type ChatStreamRequest = {
+    sessionId?: string
+    message?: string
+    spaceId?: number
+    maxResults?: number
+  }
+
+  type checkEmbeddingParams = {
+    pictureId: number
+  }
+
+  type clearSessionMessagesParams = {
+    sessionId: string
   }
 
   type CommentAddRequest = {
@@ -309,12 +360,16 @@ declare namespace API {
     contactUser?: UserVO
   }
 
-  type deleteFileParams = {
-    objectKey: string
+  type CreateSessionRequest = {
+    spaceId?: number
   }
 
   type DeleteRequest = {
     id?: number
+  }
+
+  type deleteSessionParams = {
+    sessionId: string
   }
 
   type FeedQueryRequest = {
@@ -346,6 +401,10 @@ declare namespace API {
 
   type getPictureVOByIdParams = {
     id: number
+  }
+
+  type getSessionMessagesParams = {
+    sessionId: string
   }
 
   type getSpaceByIdParams = {
@@ -620,19 +679,6 @@ declare namespace API {
     permissionList?: string[]
   }
 
-  type S3UploadRequest = {
-    pathPrefix?: string
-    fileName?: string
-  }
-
-  type S3UploadResultVO = {
-    url?: string
-    fileName?: string
-    fileSize?: number
-    contentType?: string
-    objectKey?: string
-  }
-
   type SearchPictureByColorRequest = {
     picColor?: string
     spaceId?: number
@@ -813,8 +859,22 @@ declare namespace API {
     permissionList?: string[]
   }
 
-  type uploadFileParams = {
-    request: S3UploadRequest
+  type SseEmitter = {
+    timeout?: number
+  }
+
+  type SyncEmbeddingRequest = {
+    spaceId?: number
+    forceRebuild?: boolean
+    batchSize?: number
+  }
+
+  type SyncEmbeddingResult = {
+    totalCount?: number
+    successCount?: number
+    failCount?: number
+    skipCount?: number
+    allSuccess?: boolean
   }
 
   type uploadPictureParams = {
@@ -912,8 +972,8 @@ declare namespace API {
     description?: string
     maxVotesPerUser?: number
     options?: VoteOptionAddRequest[]
-    endTime?: string
     startTime?: string
+    endTime?: string
   }
 
   type VoteActivityDeleteRequest = {

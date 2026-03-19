@@ -16,7 +16,7 @@
 // 导入必要的模块和组件
 import { computed, h, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
-import { UserOutlined, PictureOutlined, TeamOutlined, ContactsOutlined } from '@ant-design/icons-vue'
+import { UserOutlined, PictureOutlined, TeamOutlined, ContactsOutlined, RobotOutlined } from '@ant-design/icons-vue'
 import { SPACE_TYPE_ENUM } from '@/constants/space'
 import { listMyTeamSpace } from '@/api/spaceUserController'
 import { message } from 'ant-design-vue'
@@ -49,7 +49,11 @@ const fixedMenuItems = [
     label: '联系人管理',
     icon: () => h(TeamOutlined),
   },
-
+  {
+    key: '/ai/chat',
+    label: 'AI 助手',
+    icon: () => h(RobotOutlined),
+  },
 ]
 
 const teamSpaceList = ref<API.SpaceUserVO[]>([])

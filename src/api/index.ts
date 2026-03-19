@@ -1,5 +1,5 @@
 // @ts-ignore
-/* eslint-disable */
+ 
 // API 更新时间：
 // API 唯一标识：
 import * as voteController from './voteController'
@@ -7,12 +7,13 @@ import * as userController from './userController'
 import * as spaceUserController from './spaceUserController'
 import * as spaceController from './spaceController'
 import * as spaceAnalyzeController from './spaceAnalyzeController'
-import * as s3Controller from './s3Controller'
 import * as pictureController from './pictureController'
 import * as filterListController from './filterListController'
 import * as feedController from './feedController'
 import * as contactController from './contactController'
 import * as commentController from './commentController'
+import * as aiEmbeddingController from './aiEmbeddingController'
+import * as aiChatController from './aiChatController'
 import * as rankController from './rankController'
 export default {
   voteController,
@@ -20,11 +21,12 @@ export default {
   spaceUserController,
   spaceController,
   spaceAnalyzeController,
-  s3Controller,
   pictureController,
   filterListController,
   feedController,
   contactController,
   commentController,
+  aiEmbeddingController,
+  aiChatController,
   rankController,
 }

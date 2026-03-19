@@ -31,6 +31,9 @@ const SpaceUserManagePage = () => import('@/pages/admin/SpaceUserManagePage.vue'
 const VoteManagePage = () => import('@/pages/admin/VoteManagePage.vue')
 const ContactManagePage = () => import('@/pages/admin/ContactManagePage.vue')
 
+// AI 相关页面
+const AiChatPage = () => import('@/pages/ai/AiChatPage.vue')
+
 // 404 页面
 const NotFoundPage = () => import('@/pages/NotFoundPage.vue')
 
@@ -119,6 +122,12 @@ const router = createRouter({
       path: '/contactManage',
       name: '联系人管理',
       component: ContactManagePage,
+    },
+    // AI 相关路由
+    {
+      path: '/ai/chat',
+      name: 'AI 助手',
+      component: AiChatPage,
     },
     // 管理员相关路由
 
