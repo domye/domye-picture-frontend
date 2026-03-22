@@ -93,6 +93,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseListUserSearchVO = {
+    code?: number
+    data?: UserSearchVO[]
+    message?: string
+  }
+
   type BaseResponseListUserVO = {
     code?: number
     data?: UserVO[]
@@ -222,6 +228,12 @@ declare namespace API {
   type BaseResponseUser = {
     code?: number
     data?: User
+    message?: string
+  }
+
+  type BaseResponseUserProfileVO = {
+    code?: number
+    data?: UserProfileVO
     message?: string
   }
 
@@ -421,6 +433,10 @@ declare namespace API {
 
   type getUserByIdParams = {
     id: number
+  }
+
+  type getUserProfileParams = {
+    userAccount: string
   }
 
   type getUserVOByIdParams = {
@@ -684,6 +700,10 @@ declare namespace API {
     spaceId?: number
   }
 
+  type searchUsersParams = {
+    keyword: string
+  }
+
   type Space = {
     id?: number
     spaceName?: string
@@ -912,6 +932,14 @@ declare namespace API {
     userPassword?: string
   }
 
+  type UserProfileVO = {
+    userAccount?: string
+    userName?: string
+    userAvatar?: string
+    userProfile?: string
+    userRole?: string
+  }
+
   type UserQueryRequest = {
     current?: number
     pageSize?: number
@@ -933,6 +961,12 @@ declare namespace API {
     userAccount?: string
     userPassword?: string
     checkPassword?: string
+  }
+
+  type UserSearchVO = {
+    userAccount?: string
+    userName?: string
+    userAvatar?: string
   }
 
   type UserUpdateRequest = {

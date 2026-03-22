@@ -34,6 +34,9 @@ const ContactManagePage = () => import('@/pages/admin/ContactManagePage.vue')
 // AI 相关页面
 const AiChatPage = () => import('@/pages/ai/AiChatPage.vue')
 
+// 用户主页
+const UserProfilePage = () => import('@/pages/user/UserProfilePage.vue')
+
 // 404 页面
 const NotFoundPage = () => import('@/pages/NotFoundPage.vue')
 
@@ -62,6 +65,12 @@ const router = createRouter({
       path: '/user/register',
       name: '用户注册',
       component: UserRegisterPage,
+    },
+    {
+      path: '/user/:userAccount',
+      name: '用户主页',
+      component: UserProfilePage,
+      props: true,
     },
 
     // 空间相关路由

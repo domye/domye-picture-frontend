@@ -22,7 +22,21 @@
         <a-card title="图片信息" :loading="loading" class="picture-info-card">
           <a-descriptions :column="1" size="small">
             <a-descriptions-item label="作者">
-              <a-space>
+              <router-link
+                v-if="picture.user?.userAccount"
+                :to="`/user/${picture.user.userAccount}`"
+                class="author-link"
+              >
+                <a-space>
+                  <a-avatar
+                    :size="24"
+                    :src="picture.user?.userAvatar"
+                    :alt="picture.user?.userName || '用户'"
+                  />
+                  <div>{{ picture.user?.userName || '未知' }}</div>
+                </a-space>
+              </router-link>
+              <a-space v-else>
                 <a-avatar
                   :size="24"
                   :src="picture.user?.userAvatar"
@@ -274,6 +288,16 @@ onMounted(() => {
   padding-top: 16px;
 
   border-top: 1px solid #f0f0f0;
+}
+
+.author-link {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s;
+}
+
+.author-link:hover {
+  color: #1890ff;
 }
 
 @media (max-width: 768px) {
