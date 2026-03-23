@@ -35,7 +35,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { getUserProfile } from '@/api/userController'
-import { listPictureVoByPage } from '@/api/pictureController'
+import { getUserWorks } from '@/api/pictureController'
 import type { API } from '@/api/typings'
 import PictureList from '@/components/picture/PictureList.vue'
 
@@ -44,7 +44,7 @@ const route = useRoute()
 const userProfile = ref<API.UserProfileVO>({})
 const loading = ref(false)
 
-const pictureList = ref<API.PictureVO[]>([])
+const pictureList = ref<API.PictureWorkVO[]>([])
 const loadingPictures = ref(false)
 const loadingMore = ref(false)
 const current = ref(1)
@@ -74,7 +74,7 @@ const fetchUserProfile = async () => {
   }
 }
 
-// 获取用户图片（按用户账号查询）
+// 获取用户作品
 const fetchUserPictures = async (page: number = 1, append: boolean = false) => {
   const userAccount = route.params.userAccount as string
   if (!userAccount) return
@@ -86,23 +86,19 @@ const fetchUserPictures = async (page: number = 1, append: boolean = false) => {
       loadingMore.value = true
     }
 
-    const res = await listPictureVoByPage({
-      searchText: userAccount, // 通过用户账号搜索
+    const res = await getUserWorks({
+      userAccount,
       current: page,
-      pageSize,
+      size: pageSize,
     })
 
     if (res.data.code === 0 && res.data.data) {
       const records = res.data.data.records || []
-      // 过滤出该用户的图片
-      const userPictures = records.filter(
-        pic => pic.user?.userAccount === userAccount
-      )
-      
+
       if (append) {
-        pictureList.value = [...pictureList.value, ...userPictures]
+        pictureList.value = [...pictureList.value, ...records]
       } else {
-        pictureList.value = userPictures
+        pictureList.value = records
       }
       total.value = res.data.data.total || 0
       current.value = page

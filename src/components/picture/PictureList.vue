@@ -53,7 +53,7 @@ import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 
 interface Props {
-  dataList?: API.PictureVO[]
+  dataList?: API.PictureVO[] | API.PictureWorkVO[]
   loading?: boolean
   showOp?: boolean
   onReload?: () => void
@@ -71,14 +71,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 // 跳转至图片详情
 const router = useRouter()
-const doClickPicture = (picture: API.PictureVO) => {
+const doClickPicture = (picture: API.PictureVO | API.PictureWorkVO) => {
   router.push({
     path: `/picture/${picture.id}`,
   })
 }
 
 // 编辑
-const doEdit = (picture: API.PictureVO, e: Event) => {
+const doEdit = (picture: API.PictureVO | API.PictureWorkVO, e: Event) => {
   e.stopPropagation()
   router.push({
     path: '/add_picture',
@@ -90,7 +90,7 @@ const doEdit = (picture: API.PictureVO, e: Event) => {
 }
 
 // ��除
-const doDelete = async (picture: API.PictureVO, e: Event) => {
+const doDelete = async (picture: API.PictureVO | API.PictureWorkVO, e: Event) => {
   e.stopPropagation()
   const id = picture.id
   if (!id) {

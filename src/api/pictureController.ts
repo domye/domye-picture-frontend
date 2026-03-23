@@ -181,3 +181,22 @@ export async function uploadPicture(
     ...(options || {}),
   })
 }
+
+/** 获取用户作品列表 GET /picture/works */
+export async function getUserWorks(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getUserWorksParams,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponsePagePictureWorkVO>('/picture/works', {
+    method: 'GET',
+    params: {
+      // current has a default value: 1
+      current: '1',
+      // size has a default value: 20
+      size: '20',
+      ...params,
+    },
+    ...(options || {}),
+  })
+}

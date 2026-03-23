@@ -141,6 +141,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponsePagePictureWorkVO = {
+    code?: number
+    data?: PagePictureWorkVO
+    message?: string
+  }
+
   type BaseResponsePageSpace = {
     code?: number
     data?: PageSpace
@@ -443,6 +449,12 @@ declare namespace API {
     id: number
   }
 
+  type getUserWorksParams = {
+    userAccount: string
+    current?: number
+    size?: number
+  }
+
   type getVoteActivitiesParams = {
     id: number
   }
@@ -510,6 +522,20 @@ declare namespace API {
     orders?: OrderItem[]
     optimizeCountSql?: PagePictureVO
     searchCount?: PagePictureVO
+    optimizeJoinOfCountSql?: boolean
+    maxLimit?: number
+    countId?: string
+    pages?: number
+  }
+
+  type PagePictureWorkVO = {
+    records?: PictureWorkVO[]
+    total?: number
+    size?: number
+    current?: number
+    orders?: OrderItem[]
+    optimizeCountSql?: PagePictureWorkVO
+    searchCount?: PagePictureWorkVO
     optimizeJoinOfCountSql?: boolean
     maxLimit?: number
     countId?: string
@@ -693,6 +719,20 @@ declare namespace API {
     updateTime?: string
     user?: UserVO
     permissionList?: string[]
+  }
+
+  type PictureWorkVO = {
+    id?: number
+    url?: string
+    thumbnailUrl?: string
+    name?: string
+    introduction?: string
+    tags?: string[]
+    category?: string
+    picWidth?: number
+    picHeight?: number
+    picScale?: number
+    createTime?: string
   }
 
   type SearchPictureByColorRequest = {
