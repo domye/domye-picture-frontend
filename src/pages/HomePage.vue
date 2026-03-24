@@ -32,14 +32,14 @@
     </div>
     <!-- 图片瀑布流 -->
     <div class="waterfall-container" ref="waterfallContainer">
-      <TransitionGroup name="waterfall" tag="div" class="waterfall-grid" :style="gridStyle">
+      <TransitionGroup name="waterfall" tag="div" class="waterfall-masonry" :style="masonryStyle">
         <div
           v-for="picture in dataList"
           :key="picture.id"
           class="waterfall-item"
           @click="doClickPicture(picture)"
         >
-          <div class="image-container" :style="getImageContainerStyle(picture)">
+          <div class="image-container">
             <img
               v-if="picture.url"
               :alt="picture.name"
@@ -98,7 +98,7 @@ import { computed, ref, watch } from 'vue'
 import { listPictureVoByPage } from '@/api/pictureController.ts'
 import { useRouter } from 'vue-router'
 import { useTagCategories, useInfiniteScroll } from '@/composables'
-import { useElementSize, useWindowSize } from '@vueuse/core'
+import { useWindowSize } from '@vueuse/core'
 import { PictureOutlined, UserOutlined, ClockCircleOutlined } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -171,7 +171,6 @@ const { dataList, loading, loadingMore, hasMore, sentinel, refresh } =
 
 // 搜索（重置到第一页）
 const doSearch = async () => {
-  imageAspectRatios.value.clear()
   await refresh()
 }
 
@@ -185,7 +184,6 @@ const doClickPicture = (picture: API.PictureVO) => {
 
 // ========== 瀑布流布局 ==========
 const waterfallContainer = ref<HTMLElement | null>(null)
-const { width: containerWidth } = useElementSize(waterfallContainer)
 const { width: windowWidth } = useWindowSize()
 
 // 瀑布流配置
@@ -206,59 +204,11 @@ const columnCount = computed(() => {
   return MAX_COLUMNS              // 超宽屏：7列
 })
 
-// 计算实际列宽
-const actualColumnWidth = computed(() => {
-  const count = columnCount.value
-  if (count <= 0) return 200
-  return (containerWidth.value - (count - 1) * GAP) / count
-})
-
-// Grid 样式
-const gridStyle = computed(() => ({
-  gridTemplateColumns: `repeat(${columnCount.value}, 1fr)`,
-  gap: `${GAP}px`,
+// Masonry 样式
+const masonryStyle = computed(() => ({
+  columnCount: columnCount.value,
+  columnGap: `${GAP}px`,
 }))
-
-// 图片宽高比缓存
-const imageAspectRatios = ref<Map<number, number>>(new Map())
-
-// 计算图片宽高比
-const getImageAspectRatio = (picture: API.PictureVO): number => {
-  if (picture.id && imageAspectRatios.value.has(picture.id)) {
-    return imageAspectRatios.value.get(picture.id)!
-  }
-
-  let ratio = 1 // 默认正方形
-
-  if (picture.picWidth && picture.picHeight && picture.picWidth > 0) {
-    ratio = picture.picHeight / picture.picWidth
-  } else if (picture.picScale && picture.picScale > 0) {
-    ratio = 1 / picture.picScale
-  }
-
-  // 限制比例范围，避免极端情况
-  ratio = Math.max(0.5, Math.min(ratio, 2.5))
-
-  if (picture.id) {
-    imageAspectRatios.value.set(picture.id, ratio)
-  }
-
-  return ratio
-}
-
-// 计算图片实际显示高度（基于当前列宽）
-const calculateDisplayHeight = (picture: API.PictureVO): number => {
-  const ratio = getImageAspectRatio(picture)
-  return actualColumnWidth.value * ratio
-}
-
-// 图片容器样式
-const getImageContainerStyle = (picture: API.PictureVO) => {
-  const height = calculateDisplayHeight(picture)
-  return {
-    height: `${height}px`,
-  }
-}
 
 // 图片加载错误处理
 const onImageError = (event: Event, picture: API.PictureVO) => {
@@ -319,14 +269,15 @@ const formatTime = (time: string) => {
   min-height: 200px;
 }
 
-/* Grid 布局 */
-.waterfall-grid {
-  display: grid;
+/* Masonry 布局 - 使用 CSS column 实现真正瀑布流 */
+.waterfall-masonry {
   width: 100%;
 }
 
 /* 瀑布流项目 - 丝滑过渡动画 */
 .waterfall-item {
+  break-inside: avoid;
+  margin-bottom: 16px;
   cursor: pointer;
   border-radius: 12px;
   overflow: hidden;
@@ -334,15 +285,12 @@ const formatTime = (time: string) => {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   transition:
     transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    box-shadow 0.3s ease,
-    width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  will-change: transform;
+    box-shadow 0.3s ease;
 }
 
 .waterfall-item:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  transform: translateY(-4px) scale(1.02);
+  transform: translateY(-4px);
 }
 
 /* TransitionGroup 动画 */
@@ -373,13 +321,12 @@ const formatTime = (time: string) => {
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* 瀑布流图片 */
+/* 瀑布流图片 - 自适应高度 */
 .waterfall-image {
   width: 100%;
-  height: 100%;
+  height: auto;
   display: block;
   object-fit: cover;
   transition: transform 0.5s ease;
