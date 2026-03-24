@@ -12,7 +12,7 @@
         </div>
         <MentionDisplay
           class="comment-text"
-          :content="comment.content"
+          :content="comment.content || ''"
           :mentioned-users="comment.mentionedUsers"
         />
         <div class="comment-actions">
@@ -92,7 +92,7 @@
     <div v-if="showReplies" class="reply-preview-container">
       <CommentReplyList
         ref="replyListRef"
-        :comment-id="comment.commentId"
+        :comment-id="comment.commentId!"
         :picture-id="pictureId"
         :friends="friends"
         @delete-success="handleDeleteSuccess"
@@ -259,10 +259,9 @@ const handleSubmitReply = async () => {
     })
 
     const res = await addComment({
-      pictureid: props.pictureId,
-      parentid: props.comment.commentId,
+      pictureid: Number(props.pictureId),
+      parentid: props.comment.commentId!,
       content: content,
-      mentionedUserIds,
     })
 
     if (res.data.code === 0) {
@@ -272,12 +271,12 @@ const handleSubmitReply = async () => {
 
       // 构建新回复对象
       const newReply: API.CommentReplyVO = {
-        commentId: newReplyId,
-        userId: currentUser?.id,
+        commentId: Number(newReplyId),
+        userId: currentUser?.id ?? undefined,
         userName: currentUser?.userName || '我',
         userAvatar: currentUser?.userAvatar || '',
         content: content,
-        parentId: props.comment.commentId,
+        parentId: props.comment.commentId!,
         createTime: new Date().toISOString(),
       }
 

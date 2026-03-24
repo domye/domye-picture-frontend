@@ -89,7 +89,7 @@ const validateDimensions = (file: File): Promise<{ width: number; height: number
   })
 }
 
-const beforeUpload = async (file: UploadProps['fileList'][number]) => {
+const beforeUpload = async (file: File) => {
   // 1. Validate file size
   if (file.size > MAX_FILE_SIZE) {
     message.error(`文件大小超出限制，最大支持 ${MAX_FILE_SIZE / 1024 / 1024}MB`)
@@ -132,9 +132,9 @@ const beforeUpload = async (file: UploadProps['fileList'][number]) => {
 const handleUpload = async ({ file }: any) => {
   loading.value = true
   try {
-    const params: API.PictureUploadRequest = props.picture ? { id: props.picture.id } : {}
-    params.spaceId = props.spaceId
-    const res = await uploadPicture(params, {}, file)
+    const pictureUploadRequest: API.PictureUploadRequest = props.picture ? { id: props.picture.id } : {}
+    pictureUploadRequest.spaceId = props.spaceId
+    const res = await uploadPicture({ pictureUploadRequest }, {}, file)
     if (res.data.code === 0 && res.data.data) {
       message.success('图片上传成功')
       // 将上传成功的图片信息传递给父组件

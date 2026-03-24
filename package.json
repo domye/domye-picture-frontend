@@ -11,7 +11,6 @@
     "pure-build": "vite build",
     "build": "vite build",
     "preview": "vite preview",
-    "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "openapi": "node openapi.config.js",
     "lint": "eslint . --fix",

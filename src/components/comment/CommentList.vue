@@ -62,7 +62,7 @@ const loginUserStore = useLoginUserStore()
 
 // AI 助手常量
 const AI_ASSISTANT: API.UserVO = {
-  id: '2020004031158120450',
+  id: 2020004031158120450,
   userName: 'AI助手',
   userAvatar: '',
   userProfile: '智能AI助手，为您解答问题',
@@ -177,9 +177,8 @@ const handleSubmitComment = async () => {
     })
 
     const res = await addComment({
-      pictureid: props.pictureId,
+      pictureid: Number(props.pictureId),
       content: content,
-      mentionedUserIds,
     })
 
     if (res.data.code === 0) {

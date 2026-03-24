@@ -127,9 +127,9 @@ const loading = ref(false)
 const handleUpload = async ({ file }: any) => {
   loading.value = true
   try {
-    const params: API.PictureUploadRequest = props.picture ? { id: props.picture.id } : {}
-    params.spaceId = props.spaceId
-    const res = await uploadPicture(params, {}, file)
+    const pictureUploadRequest: API.PictureUploadRequest = props.picture ? { id: props.picture.id } : {}
+    pictureUploadRequest.spaceId = props.spaceId
+    const res = await uploadPicture({ pictureUploadRequest }, {}, file)
     if (res.data.code === 0 && res.data.data) {
       message.success('图片上传成功')
       // 将上传成功的图片信息传递给父组件
@@ -138,9 +138,10 @@ const handleUpload = async ({ file }: any) => {
     } else {
       message.error('图片上传失败，' + res.data.message)
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('图片上传失败', error)
-    message.error('图片上传失败，' + error.message)
+    const err = error as Error
+    message.error('图片上传失败，' + err.message)
   }
   loading.value = false
 }
@@ -192,6 +193,14 @@ const canEdit = computed(() => {
   return editingUser.value?.id === loginUser.id
 })
 
+interface WebSocketMessage {
+  message?: string
+  user?: API.UserVO
+  editAction?: string
+  rotateDegree?: number
+  scaleRatio?: number
+}
+
 // 编写 WebSocket 逻辑
 let websocket: PictureEditWebSocket | null
 
@@ -209,27 +218,27 @@ const initWebsocket = () => {
   websocket = new PictureEditWebSocket(pictureId)
 
   // 先注册事件处理器，再建立连接（避免竞态条件）
-  websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.INFO, (msg) => {
+  websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.INFO, (msg?: WebSocketMessage) => {
     logger.log('收到通知消息', msg)
-    message.info(msg.message)
+    message.info(msg?.message || '')
   })
 
-  websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.ERROR, (msg) => {
+  websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.ERROR, (msg?: WebSocketMessage) => {
     logger.error('收到错误通知', msg)
-    message.info(msg.message)
+    message.info(msg?.message || '')
   })
 
-  websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.ENTER_EDIT, (msg) => {
+  websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.ENTER_EDIT, (msg?: WebSocketMessage) => {
     logger.log('收到进入编辑状态的消息', msg)
-    message.info(msg.message)
-    editingUser.value = msg.user
+    message.info(msg?.message || '')
+    editingUser.value = msg?.user
   })
 
-  websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EDIT_ACTION, (msg) => {
+  websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EDIT_ACTION, (msg?: WebSocketMessage) => {
     logger.log('收到编辑操作的消息', msg)
-    message.info(msg.message)
+    message.info(msg?.message || '')
     // 根据收到的编辑操作，执行相应的操作（使用静默方法，避免消息循环）
-    switch (msg.editAction) {
+    switch (msg?.editAction) {
       case PICTURE_EDIT_ACTION_ENUM.ROTATE_LEFT:
         rotateLeftSilent()
         break
@@ -245,16 +254,16 @@ const initWebsocket = () => {
     }
   })
 
-  websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EXIT_EDIT, (msg) => {
+  websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EXIT_EDIT, (msg?: WebSocketMessage) => {
     logger.log('收到退出编辑状态的消息', msg)
-    message.info(msg.message)
+    message.info(msg?.message || '')
     editingUser.value = undefined
   })
 
   // 同步编辑状态（新用户加入时）
-  websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.SYNC_STATE, (msg) => {
+  websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.SYNC_STATE, (msg?: WebSocketMessage) => {
     logger.log('收到同步编辑状态的消息', msg)
-    if (msg.rotateDegree !== undefined || msg.scaleRatio !== undefined) {
+    if (msg?.rotateDegree !== undefined || msg?.scaleRatio !== undefined) {
       // 应用旋转角度
       if (msg.rotateDegree !== undefined && cropperRef.value) {
         const rotations = msg.rotateDegree / 90

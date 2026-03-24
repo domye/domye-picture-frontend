@@ -34,9 +34,6 @@ const fetchData = async () => {
   loading.value = true
   // 转换搜索参数
   const res = await getSpaceRankAnalyze({
-    queryAll: props.queryAll,
-    queryPublic: props.queryPublic,
-    spaceId: props.spaceId,
     topN: 10, // 后端默认是 10
   })
   if (res.data.code === 0 && res.data.data) {

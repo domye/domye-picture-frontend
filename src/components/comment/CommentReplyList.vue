@@ -35,7 +35,7 @@
             <!-- 回复的回复输入框 -->
             <div v-if="showReplyInputFor === reply.commentId" class="reply-input-container">
               <MentionInput
-                :ref="(el) => setReplyRef(reply.commentId, el)"
+                :ref="(el) => setReplyRef(reply.commentId!, el)"
                 v-model="replyContent"
                 :friends="friends || []"
                 :placeholder="`回复 ${reply.userName}`"
@@ -141,7 +141,7 @@ const fetchReplyList = async (page: number = 1, append: boolean = false) => {
     const res = await listReplyComments({
       request: {
         pictureId: Number(props.pictureId),
-        commentId: props.commentId,
+        commentId: Number(props.commentId),
         current: page,
         pageSize: pageSize.value,
       },
@@ -175,7 +175,7 @@ const fetchReplyList = async (page: number = 1, append: boolean = false) => {
 
 // 处理回复
 const handleReply = (reply: API.CommentReplyVO) => {
-  showReplyInputFor.value = reply.commentId
+  showReplyInputFor.value = reply.commentId ?? null
   replyContent.value = ''
 }
 
@@ -188,7 +188,7 @@ const handleSubmitReply = async (reply: API.CommentReplyVO) => {
   }
 
   // Get mentioned users from the MentionInput ref
-  const mentionInputRef = replyInputRefs.value.get(reply.commentId)
+  const mentionInputRef = reply.commentId ? replyInputRefs.value.get(reply.commentId) : undefined
   const mentionedUsers = mentionInputRef?.getMentionedUsers() || []
   const mentionedUserIds = mentionedUsers.map((u) => u.id).filter(Boolean) as number[]
 
@@ -213,10 +213,9 @@ const handleSubmitReply = async (reply: API.CommentReplyVO) => {
   submitting.value = true
   try {
     const res = await addComment({
-      pictureid: props.pictureId,
+      pictureid: Number(props.pictureId),
       parentid: reply.commentId,
       content: content,
-      mentionedUserIds,
     })
 
     if (res.data.code === 0) {
@@ -230,8 +229,8 @@ const handleSubmitReply = async (reply: API.CommentReplyVO) => {
 
       // 构建新回复对象
       const newReply: API.CommentReplyVO = {
-        commentId: newReplyId,
-        userId: currentUser?.id,
+        commentId: Number(newReplyId),
+        userId: currentUser?.id ?? undefined,
         userName: currentUser?.userName || '我',
         userAvatar: currentUser?.userAvatar || '',
         content: content,
