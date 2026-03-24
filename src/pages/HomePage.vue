@@ -32,11 +32,7 @@
     </div>
     <!-- 图片瀑布流 -->
     <div class="waterfall-container" ref="waterfallContainer">
-      <div
-        v-for="(column, colIndex) in columns"
-        :key="colIndex"
-        class="waterfall-column"
-      >
+      <div v-for="(column, colIndex) in columns" :key="colIndex" class="waterfall-column">
         <div
           v-for="picture in column"
           :key="picture.id"
@@ -47,7 +43,7 @@
             <img
               v-if="picture.thumbnailUrl || picture.url"
               :alt="picture.name"
-              :src="picture.thumbnailUrl || picture.url"
+              :src="picture.url"
               class="waterfall-image"
               loading="lazy"
               @error="onImageError($event, picture)"
@@ -86,9 +82,7 @@
     <!-- 加载更多 sentinel -->
     <div ref="sentinel" class="load-more-sentinel">
       <a-spin v-if="loadingMore" size="large" />
-      <span v-else-if="!hasMore && dataList.length > 0" class="no-more-text">
-        已经到底啦 ~
-      </span>
+      <span v-else-if="!hasMore && dataList.length > 0" class="no-more-text"> 已经到底啦 ~ </span>
     </div>
     <!-- 首次加载状态 -->
     <div v-if="loading && dataList.length === 0" class="loading-container">
@@ -104,7 +98,7 @@ import { computed, ref, watch } from 'vue'
 import { listPictureVoByPage } from '@/api/pictureController.ts'
 import { useRouter } from 'vue-router'
 import { useTagCategories, useInfiniteScroll } from '@/composables'
-import { useElementSize } from '@vueuse/core'
+import { useElementSize, useWindowSize } from '@vueuse/core'
 import { PictureOutlined, UserOutlined, ClockCircleOutlined } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -192,28 +186,34 @@ const doClickPicture = (picture: API.PictureVO) => {
 // ========== 瀑布流布局 ==========
 const waterfallContainer = ref<HTMLElement | null>(null)
 const { width: containerWidth } = useElementSize(waterfallContainer)
+const { width: windowWidth } = useWindowSize()
 
 // 瀑布流配置
 const GAP = 16
-const MIN_COLUMN_WIDTH = 200
+const MIN_COLUMN_WIDTH = 180
 const MAX_COLUMNS = 7
-const MIN_COLUMNS = 1
+const MOBILE_BREAKPOINT = 768 // 移动端断点，小于此宽度强制单列
 
 // 计算列数
 const columnCount = computed(() => {
+  // 窗口宽度小于移动端断点时，强制单列
+  if (windowWidth.value < MOBILE_BREAKPOINT) {
+    return 1
+  }
+
   const width = containerWidth.value
-  if (width <= 0) return MIN_COLUMNS
+  if (width <= 0) return 1
 
   let count = Math.floor((width + GAP) / (MIN_COLUMN_WIDTH + GAP))
-  count = Math.max(MIN_COLUMNS, Math.min(MAX_COLUMNS, count))
+  count = Math.max(1, Math.min(MAX_COLUMNS, count))
   return count
 })
 
 // 图片高度缓存（基于原始尺寸）
 const imageHeights = ref<Map<number, number>>(new Map())
 
-// 预计算图片高度（使用 API 返回的尺寸，基于基准列宽 200px）
-const BASE_COLUMN_WIDTH = 200 // 基准列宽，用于计算固定高度比例
+// 预计算图片高度（使用 API 返回的尺寸，基于基准列宽）
+const BASE_COLUMN_WIDTH = 180 // 基准列宽，用于计算固定高度比例
 
 const calculateImageHeight = (picture: API.PictureVO): number => {
   if (picture.id && imageHeights.value.has(picture.id)) {
