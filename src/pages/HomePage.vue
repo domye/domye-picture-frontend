@@ -31,31 +31,37 @@
       </a-space>
     </div>
     <!-- 图片瀑布流 -->
-    <div class="waterfall-container" :style="{ columnCount: dynamicColumnCount }">
+    <div class="waterfall-container" ref="waterfallContainer">
       <div
-        v-for="(picture, index) in dataList"
-        :key="picture.id"
-        class="waterfall-item card-hover"
-        @click="doClickPicture(picture)"
-        :class="`fade-in-delay-${(index % 5) + 1}`"
+        v-for="(column, colIndex) in columns"
+        :key="colIndex"
+        class="waterfall-column"
+        :style="{ width: columnWidth + 'px' }"
       >
-        <div class="image-container">
-          <img
-            :alt="picture.name"
-            :src="picture.url"
-            class="waterfall-image"
-            @load="onImageLoad($event, picture)"
-          />
-        </div>
-        <div class="image-info">
-          <h3>{{ picture.name }}</h3>
-          <div class="tags">
-            <a-tag color="green" class="tag">
-              {{ picture.category ?? '默认' }}
-            </a-tag>
-            <a-tag v-for="tag in picture.tags" :key="tag" class="tag">
-              {{ tag }}
-            </a-tag>
+        <div
+          v-for="picture in column"
+          :key="picture.id"
+          class="waterfall-item card-hover"
+          @click="doClickPicture(picture)"
+        >
+          <div class="image-container">
+            <img
+              :alt="picture.name"
+              :src="picture.url"
+              class="waterfall-image"
+              @load="onImageLoad($event, picture)"
+            />
+          </div>
+          <div class="image-info">
+            <h3>{{ picture.name }}</h3>
+            <div class="tags">
+              <a-tag color="green" class="tag">
+                {{ picture.category ?? '默认' }}
+              </a-tag>
+              <a-tag v-for="tag in picture.tags" :key="tag" class="tag">
+                {{ tag }}
+              </a-tag>
+            </div>
           </div>
         </div>
       </div>
@@ -80,19 +86,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { listPictureVoByPage } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useTagCategories } from '@/composables'
 
 // 使用标签分类 composable
-const { tagList, categoryList, loading: tagsLoading } = useTagCategories()
+const { tagList, categoryList } = useTagCategories()
 
 // 定义数据
 const dataList = ref<API.PictureVO[]>([])
 const total = ref(0)
 const loading = ref(true)
+const screenWidth = ref(window.innerWidth)
+const waterfallContainer = ref<HTMLElement | null>(null)
+let resizeObserver: ResizeObserver | null = null
 
 // 搜索条件
 const searchParams = reactive<API.PictureQueryRequest>({
@@ -142,9 +151,30 @@ const fetchData = async () => {
   loading.value = false
 }
 
+// 监听窗口大小变化
+const handleResize = () => {
+  screenWidth.value = window.innerWidth
+}
+
 // 页面加载时获取数据
 onMounted(() => {
   fetchData()
+  window.addEventListener('resize', handleResize)
+
+  // 使用 ResizeObserver 监听容器实际宽度
+  if (waterfallContainer.value) {
+    resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        screenWidth.value = entry.contentRect.width
+      }
+    })
+    resizeObserver.observe(waterfallContainer.value)
+  }
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+  resizeObserver?.disconnect()
 })
 
 // 搜索
@@ -162,49 +192,73 @@ const doClickPicture = (picture: API.PictureVO) => {
   })
 }
 
-// 存储图片尺寸信息
-const imageSizes = ref<Map<string, { width: number; height: number; aspectRatio: number }>>(
-  new Map(),
-)
+// 计算动态列数和列宽 - 基于屏幕宽度和间距
+const gap = 16
 
-// 图片加载完成后的处理
-const onImageLoad = (event: Event, picture: API.PictureVO) => {
-  const img = event.target as HTMLImageElement
-  const originalWidth = img.naturalWidth
-  const originalHeight = img.naturalHeight
-  const newAspectRatio = originalWidth / originalHeight
+const columnCount = computed(() => {
+  const minColumnWidth = 200 // 每列最小宽度
 
-  // 存储图片尺寸信息
-  imageSizes.value.set(picture.id, {
-    width: originalWidth,
-    height: originalHeight,
-    aspectRatio: newAspectRatio,
-  })
-
-  // 设置图片的宽高比
-  img.style.width = '100%'
-  img.style.height = `calc(100% / ${newAspectRatio})`
-}
-
-// 计算动态列数
-const dynamicColumnCount = computed(() => {
-  if (imageSizes.value.size === 0) return 5 // 默认5列
-
-  // 获取所有图片的宽高比
-  const aspectRatios = Array.from(imageSizes.value.values()).map((img) => img.aspectRatio)
-
-  // 计算平均宽高比
-  const avgAspectRatio = aspectRatios.reduce((sum, ratio) => sum + ratio, 0) / aspectRatios.length
-
-  let columnCount = Math.round(7 / avgAspectRatio)
+  // 计算能放下的列数：screenWidth >= n * minColumnWidth + (n-1) * gap
+  let count = Math.floor((screenWidth.value + gap) / (minColumnWidth + gap))
 
   // 限制最大和最小列数
-  const maxColumns = 10
-  const minColumns = 5
-  columnCount = Math.max(minColumns, Math.min(maxColumns, columnCount))
+  const maxColumns = 7
+  const minColumns = 1
+  count = Math.max(minColumns, Math.min(maxColumns, count))
 
-  return columnCount
+  return count
 })
+
+// 计算每列的精确宽度，确保填满容器
+const columnWidth = computed(() => {
+  const count = columnCount.value
+  // 列宽 = (容器宽度 - (列数-1) * 间距) / 列数
+  return (screenWidth.value - (count - 1) * gap) / count
+})
+
+// 瀑布流列数据
+const columns = ref<API.PictureVO[][]>([])
+const imageHeights = ref<Map<number, number>>(new Map())
+
+// 图片加载完成后记录高度
+const onImageLoad = (event: Event, picture: API.PictureVO) => {
+  const img = event.target as HTMLImageElement
+  if (img) {
+    // 计算在当前列宽下的实际显示高度
+    const displayHeight = (img.naturalHeight / img.naturalWidth) * columnWidth.value
+    imageHeights.value.set(picture.id!, displayHeight)
+    distributePictures()
+  }
+}
+
+// 分配图片到各列
+const distributePictures = () => {
+  const count = columnCount.value
+  const newColumns: API.PictureVO[][] = Array.from({ length: count }, () => [])
+  const newHeights: number[] = Array(count).fill(0)
+
+  // 按顺序分配每张图片到当前高度最小的列
+  dataList.value.forEach((picture) => {
+    // 找到当前高度最小的列
+    const minHeight = Math.min(...newHeights)
+    const minIndex = newHeights.indexOf(minHeight)
+
+    newColumns[minIndex].push(picture)
+    // 使用图片高度（如果已加载）或默认高度估算
+    newHeights[minIndex] += imageHeights.value.get(picture.id!) ?? columnWidth.value
+  })
+
+  columns.value = newColumns
+}
+
+// 监听数据和列数变化，重新分配
+watch(
+  [dataList, columnCount],
+  () => {
+    distributePictures()
+  },
+  { immediate: true },
+)
 
 // 分页变化处理
 const onPageChange = (page: number) => {
@@ -261,15 +315,20 @@ const onShowSizeChange = (current: number, size: number) => {
 
 /* 瀑布流容器 */
 .waterfall-container {
-  column-gap: 16px;
+  display: flex;
+  gap: 16px;
   margin-bottom: 24px;
-  transition: column-count 0.3s ease;
+}
+
+/* 瀑布流列 */
+.waterfall-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 /* 瀑布流项目 */
 .waterfall-item {
-  break-inside: avoid;
-  margin-bottom: 16px;
   cursor: pointer;
   border-radius: 8px;
   overflow: hidden;
@@ -353,29 +412,7 @@ const onShowSizeChange = (current: number, size: number) => {
 }
 
 /* 响应式布局 - 在小屏幕上进一步限制列数 */
-@media (max-width: 1200px) {
-  .waterfall-container {
-    column-count: 4 !important;
-  }
-}
-
-@media (max-width: 992px) {
-  .waterfall-container {
-    column-count: 3 !important;
-  }
-}
-
-@media (max-width: 768px) {
-  .waterfall-container {
-    column-count: 2 !important;
-  }
-}
-
 @media (max-width: 576px) {
-  .waterfall-container {
-    column-count: 1 !important;
-  }
-
   .search-input {
     border-radius: 20px;
   }
