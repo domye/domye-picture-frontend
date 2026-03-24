@@ -84,7 +84,7 @@ const doEdit = (picture: API.PictureVO | API.PictureWorkVO, e: Event) => {
     path: '/add_picture',
     query: {
       id: picture.id,
-      spaceId: picture.spaceId,
+      spaceId: 'spaceId' in picture ? picture.spaceId : undefined,
     },
   })
 }
@@ -100,7 +100,7 @@ const doDelete = async (picture: API.PictureVO | API.PictureWorkVO, e: Event) =>
   if (res.data.code === 0) {
     message.success('删除成功')
     // 让外层刷新
-    props?.onReload()
+    props.onReload?.()
   } else {
     message.error('删除失败')
   }

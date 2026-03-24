@@ -19,7 +19,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { API } from '@/api/typings'
 
 // AI 助手 ID 和名称
 const AI_ASSISTANT_ID = '2020004031158120450'

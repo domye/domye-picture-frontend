@@ -57,12 +57,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import {
-  getVoteActivities,
-  addVoteRecord,
-  endVoteActivities,
-} from '@/api/voteController'
-import type { API } from '@/api/typings'
+import { getVoteActivities, addVoteRecord, endVoteActivities } from '@/api/voteController'
 import router from '@/router'
 import { formatDate } from '@/utils'
 

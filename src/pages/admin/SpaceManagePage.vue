@@ -121,16 +121,12 @@ import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { formatSize } from '@/utils'
-import {
-  deleteSpace,
-  listSpaceByPage,
-  listSpaceLevel,
-} from '@/api/spaceController'
-import { SPACE_LEVEL_MAP, SPACE_TYPE_MAP } from '@/constants/space'
+import { deleteSpace, listSpaceByPage, listSpaceLevel } from '@/api/spaceController'
+import { SPACE_LEVEL_MAP, SPACE_TYPE_MAP, SPACE_TYPE_OPTIONS } from '@/constants/space'
 // 数据
-const dataList = ref([])
+const dataList = ref<API.Space[]>([])
 const total = ref(0)
-const SPACE_LEVEL_OPTIONS = ref<string[]>([])
+const SPACE_LEVEL_OPTIONS = ref<{ value: number | undefined; label: string }[]>([])
 
 // 表格列
 const columns = [
@@ -183,7 +179,7 @@ const pagination = computed(() => {
     current: searchParams.current ?? 1,
     pageSize: searchParams.pageSize ?? 10,
     total: total.value,
-    showTotal: (total) => `共 ${total} 条`,
+    showTotal: (total: number) => `共 ${total} 条`,
     showSizeChanger: true,
     pageSizeOptions: ['10', '20', '50', '100'],
   }

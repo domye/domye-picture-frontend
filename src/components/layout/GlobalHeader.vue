@@ -155,7 +155,8 @@ const originItems = [
 // 过滤菜单项，仅管理员可访问管理页面
 const filterMenus = (menus = [] as MenuProps['items']) => {
   return menus?.filter((menu) => {
-    if (menu.key.startsWith('/admin')) {
+    const key = menu?.key
+    if (key && String(key).startsWith('/admin')) {
       const loginUser = loginUserStore.loginUser
       if (!loginUser || loginUser.userRole !== 'admin') {
         return false

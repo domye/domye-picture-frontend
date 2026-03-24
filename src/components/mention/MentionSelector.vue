@@ -48,7 +48,6 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
-import type { API } from '@/api/typings'
 import { CheckOutlined, UsergroupAddOutlined } from '@ant-design/icons-vue'
 
 interface Props {

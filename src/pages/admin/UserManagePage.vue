@@ -74,11 +74,7 @@
 <script lang="ts" setup>
 import dayjs from 'dayjs'
 import { deleteUser, listUserVoByPage } from '@/api/userController'
-import {
-  addFilterList,
-  removeFilterList,
-  getFilterList,
-} from '@/api/filterListController'
+import { addFilterList, removeFilterList, getFilterList } from '@/api/filterListController'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { DownOutlined } from '@ant-design/icons-vue'
@@ -151,7 +147,7 @@ const handleAddToBlacklist = async (userId: number) => {
   })
   if (res.data.code === 0) {
     message.success('已加入黑名单')
-    await getUserFilterStatus()
+    await fetchData()
   } else {
     message.error('操作失败，' + res.data.message)
   }
@@ -166,7 +162,7 @@ const handleRemoveFromBlacklist = async (userId: number) => {
   })
   if (res.data.code === 0) {
     message.success('已移出黑名单')
-    await getUserFilterStatus()
+    await fetchData()
   } else {
     message.error('操作失败，' + res.data.message)
   }
@@ -181,7 +177,7 @@ const handleAddToWhitelist = async (userId: number) => {
   })
   if (res.data.code === 0) {
     message.success('已加入白名单')
-    await getUserFilterStatus()
+    await fetchData()
   } else {
     message.error('操作失败，' + res.data.message)
   }
@@ -196,10 +192,15 @@ const handleRemoveFromWhitelist = async (userId: number) => {
   })
   if (res.data.code === 0) {
     message.success('已移出白名单')
-    await getUserFilterStatus()
+    await fetchData()
   } else {
     message.error('操作失败，' + res.data.message)
   }
+}
+
+// 获取用户过滤状态（黑/白名单）
+const getUserFilterStatus = async () => {
+  // TODO: 实现获取用户过滤状态逻辑
 }
 
 // 分页参数
@@ -209,7 +210,7 @@ const pagination = computed(() => {
     pageSize: searchParams.pageSize ?? 10,
     total: total.value,
     showSizeChanger: true,
-    showTotal: (total) => `共 ${total} 条`,
+    showTotal: (total: number) => `共 ${total} 条`,
   }
 })
 
@@ -247,7 +248,6 @@ const fetchData = async () => {
     dataList.value = res.data.data.records ?? []
     // 确保total是数字类型
     total.value = Number(res.data.data.total) ?? 0
-    await getUserFilterStatus()
   } else {
     message.error('获取数据失败，' + res.data.message)
   }

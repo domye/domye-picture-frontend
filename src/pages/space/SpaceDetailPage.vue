@@ -63,10 +63,7 @@
 </template>
 <script lang="ts" setup>
 import { computed, h, watch } from 'vue'
-import {
-  listPictureVoByPage,
-  searchPictureByColor,
-} from '@/api/pictureController'
+import { listPictureVoByPage, searchPictureByColor } from '@/api/pictureController'
 import { getSpaceVoById } from '@/api/spaceController'
 import PictureList from '@/components/picture/PictureList.vue'
 import PictureSearchForm from '@/components/picture/PictureSearchForm.vue'

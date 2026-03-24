@@ -201,11 +201,7 @@
 import dayjs from 'dayjs'
 import { message } from 'ant-design-vue'
 import { onMounted, reactive, ref } from 'vue'
-import {
-  deletePicture,
-  doPictureReview,
-  listPictureByPage,
-} from '@/api/pictureController'
+import { deletePicture, doPictureReview, listPictureByPage } from '@/api/pictureController'
 import {
   PIC_REVIEW_STATUS_ENUM,
   PIC_REVIEW_STATUS_MAP,

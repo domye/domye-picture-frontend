@@ -1,7 +1,7 @@
 <template>
   <div class="space-rank-analyze">
     <a-card title="空间使用排行分析">
-      <v-chart :option="options" style="height: 320px; max-width: 100%;" :loading="loading" />
+      <v-chart :option="options" style="height: 320px; max-width: 100%" :loading="loading" />
     </a-card>
   </div>
 </template>
@@ -57,7 +57,7 @@ watchEffect(() => {
 // 图表选项
 const options = computed(() => {
   const spaceNames = dataList.value.map((item) => item.spaceName)
-  const usageData = dataList.value.map((item) => (item.totalSize / (1024 * 1024)).toFixed(2)) // 转为 MB
+  const usageData = dataList.value.map((item) => ((item.totalSize || 0) / (1024 * 1024)).toFixed(2)) // 转为 MB
 
   return {
     tooltip: { trigger: 'axis' },

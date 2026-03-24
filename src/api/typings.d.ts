@@ -1046,8 +1046,8 @@ declare namespace API {
     description?: string
     maxVotesPerUser?: number
     options?: VoteOptionAddRequest[]
-    startTime?: string
     endTime?: string
+    startTime?: string
   }
 
   type VoteActivityDeleteRequest = {

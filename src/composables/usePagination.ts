@@ -16,7 +16,10 @@ export interface PaginationState<T> {
 /**
  * 分页请求函数类型
  */
-export type PaginationFetchFn<T> = (page: number, pageSize: number) => Promise<{
+export type PaginationFetchFn<T> = (
+  page: number,
+  pageSize: number,
+) => Promise<{
   records: T[]
   total: number
   current?: number

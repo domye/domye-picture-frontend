@@ -82,7 +82,6 @@
 import { ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { addComment, listReplyComments } from '@/api/commentController'
-import type { API } from '@/api/typings'
 import { MessageOutlined } from '@ant-design/icons-vue'
 import { formatTime } from '@/utils'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
@@ -140,10 +139,12 @@ const fetchReplyList = async (page: number = 1, append: boolean = false) => {
     }
 
     const res = await listReplyComments({
-      pictureId: props.pictureId,
-      commentId: props.commentId,
-      current: page,
-      pageSize: pageSize.value,
+      request: {
+        pictureId: Number(props.pictureId),
+        commentId: props.commentId,
+        current: page,
+        pageSize: pageSize.value,
+      },
     })
 
     if (res.data.code === 0 && res.data.data) {

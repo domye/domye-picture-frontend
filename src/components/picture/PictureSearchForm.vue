@@ -74,7 +74,7 @@ import dayjs from 'dayjs'
 import { onMounted, reactive, ref } from 'vue'
 
 interface Props {
-  onSearch?: (searchParams: PictureQueryRequest) => void
+  onSearch?: (searchParams: API.PictureQueryRequest) => void
 }
 
 const props = defineProps<Props>()
@@ -108,8 +108,8 @@ const rangePresets = ref([
   { label: '过去 30 天', value: [dayjs().add(-30, 'd'), dayjs()] },
   { label: '过去 90 天', value: [dayjs().add(-90, 'd'), dayjs()] },
 ])
-const categoryOptions = ref<string[]>([])
-const tagOptions = ref<string[]>([])
+const categoryOptions = ref<{ value: string; label: string }[]>([])
+const tagOptions = ref<{ value: string; label: string }[]>([])
 
 // 获取标签和分类选项
 const getTagCategoryOptions = async () => {
@@ -136,7 +136,7 @@ const getTagCategoryOptions = async () => {
 const doClear = () => {
   // 取消所有对象的值
   Object.keys(searchParams).forEach((key) => {
-    searchParams[key] = undefined
+    ;(searchParams as Record<string, unknown>)[key] = undefined
   })
   dateRange.value = []
   props.onSearch?.(searchParams)

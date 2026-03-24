@@ -44,7 +44,7 @@ const { width: windowWidth } = useWindowSize()
 const isMobile = computed(() => windowWidth.value < 768)
 
 // 图表数据
-const dataList = ref<API.SpaceCategoryAnalyzeResponse>([])
+const dataList = ref<API.SpaceCategoryAnalyzeResponse[]>([])
 // 加载状态
 const loading = ref(true)
 // 点击的图表项

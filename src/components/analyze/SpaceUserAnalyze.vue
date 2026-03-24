@@ -54,7 +54,7 @@ const doSearch = (value: string) => {
 }
 
 // 图表数据
-const dataList = ref<API.SpaceCategoryAnalyzeResponse>([])
+const dataList = ref<API.SpaceUserAnalyzeResponse[]>([])
 // 加载状态
 const loading = ref(true)
 
@@ -67,7 +67,7 @@ const fetchData = async () => {
     queryPublic: props.queryPublic,
     spaceId: props.spaceId,
     timeDimension: timeDimension.value,
-    userId: userId.value,
+    userId: userId.value ? Number(userId.value) : undefined,
   })
   if (res.data.code === 0 && res.data.data) {
     dataList.value = res.data.data ?? []

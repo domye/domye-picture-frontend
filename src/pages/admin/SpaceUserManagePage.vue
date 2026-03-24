@@ -27,7 +27,11 @@
     <a-form v-else layout="inline" :model="formData" @finish="handleSubmit">
       <a-form-item label="选择联系人" name="userId">
         <a-select v-model:value="formData.userId" placeholder="请选择联系人" style="width: 200px">
-          <a-select-option v-for="contact in contactList" :key="contact.contactUserId" :value="contact.contactUserId">
+          <a-select-option
+            v-for="contact in contactList"
+            :key="contact.contactUserId"
+            :value="contact.contactUserId"
+          >
             <a-avatar :src="contact.contactUser?.userAvatar" size="small" />
             {{ contact.contactUser?.userName }}
           </a-select-option>

@@ -52,8 +52,8 @@ const theme = {
       itemActiveBg: '#748CBC',
       colorItemText: '#3a5f8d',
       colorItemTextActive: '#ffffff',
-    }
-  }
+    },
+  },
 }
 </script>
 

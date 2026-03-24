@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // 图表数据
-const dataList = ref<API.SpaceCategoryAnalyzeResponse>([])
+const dataList = ref<API.SpaceTagAnalyzeResponse[]>([])
 // 加载状态
 const loading = ref(true)
 
@@ -55,8 +55,8 @@ watchEffect(() => {
 })
 
 // 图表选项
-const options =computed(() => {
-  const tagData = dataList.value.map((item) => ({
+const options = computed(() => {
+  const tagData = (dataList.value || []).map((item) => ({
     name: item.tag,
     value: item.count,
   }))
@@ -75,9 +75,9 @@ const options =computed(() => {
         shape: 'circle',
         textStyle: {
           color: () =>
-              `rgb(${Math.round(Math.random() * 255)}, ${Math.round(
-                  Math.random() * 255,
-              )}, ${Math.round(Math.random() * 255)})`, // 随机颜色
+            `rgb(${Math.round(Math.random() * 255)}, ${Math.round(
+              Math.random() * 255,
+            )}, ${Math.round(Math.random() * 255)})`, // 随机颜色
         },
         data: tagData,
       },

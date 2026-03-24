@@ -2,8 +2,6 @@
  * 评论相关类型定义
  */
 
-import type { API } from '@/api/typings'
-
 /**
  * 评论列表项（扩展自 API.CommentListVO）
  */

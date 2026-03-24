@@ -71,11 +71,7 @@
     >
       <a-form layout="vertical">
         <a-form-item label="用户ID" required>
-          <a-input
-            v-model:value="newContactUserId"
-            placeholder="请输入用户ID"
-            allow-clear
-          />
+          <a-input v-model:value="newContactUserId" placeholder="请输入用户ID" allow-clear />
         </a-form-item>
       </a-form>
     </a-modal>

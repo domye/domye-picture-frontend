@@ -38,12 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  addSpace,
-  getSpaceVoById,
-  listSpaceLevel,
-  updateSpace,
-} from '@/api/spaceController'
+import { addSpace, getSpaceVoById, listSpaceLevel, updateSpace } from '@/api/spaceController'
 import {
   SPACE_LEVEL_ENUM,
   SPACE_TYPE_ENUM,

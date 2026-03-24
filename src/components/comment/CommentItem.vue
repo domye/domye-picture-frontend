@@ -76,7 +76,8 @@
             <span v-if="shouldShowParent(reply)" class="reply-parent">
               回复 <span class="reply-parent-name">@{{ getParentUserName(reply) }}</span>
             </span>
-            <span class="reply-text">：</span><MentionDisplay
+            <span class="reply-text">：</span
+            ><MentionDisplay
               class="reply-text"
               :content="reply.content || ''"
               :mentioned-users="reply.mentionedUsers"
@@ -105,7 +106,6 @@
 import { ref, computed } from 'vue'
 import { message } from 'ant-design-vue'
 import { addComment, listReplyComments } from '@/api/commentController'
-import type { API } from '@/api/typings'
 import CommentReplyList from './CommentReplyList.vue'
 import MentionInput from '@/components/mention/MentionInput.vue'
 import MentionDisplay from '@/components/mention/MentionDisplay.vue'
@@ -201,10 +201,12 @@ const loadReplyPreviews = async () => {
   try {
     loadingReplies.value = true
     const res = await listReplyComments({
-      pictureId: props.pictureId,
-      commentId: props.comment.commentId,
-      current: 1,
-      pageSize: 5,
+      request: {
+        pictureId: Number(props.pictureId),
+        commentId: props.comment.commentId,
+        current: 1,
+        pageSize: 5,
+      },
     })
 
     if (res.data.code === 0 && res.data.data) {

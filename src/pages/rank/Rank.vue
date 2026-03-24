@@ -46,17 +46,19 @@ const columns = [
     key: 'score',
   },
 ]
-const rankList = ref([])
+const rankList = ref<API.UserActiveRankItemVO[]>([])
 
 // 定义排行榜周期
 const period = ref(1)
-const params: API.getUserActivityScoreUsingGETParams = {
-  size: 10,
-  value: period.value,
+const params: API.getUserActivityScoreParams = {
+  userActivityScoreQueryRequest: {
+    size: 10,
+    value: period.value,
+  },
 }
 
 watch(period, async (newPeriod) => {
-  params.value = newPeriod
+  params.userActivityScoreQueryRequest.value = newPeriod
   await fetchData(newPeriod)
 })
 
@@ -64,7 +66,7 @@ const fetchData = async (period: number) => {
   try {
     const res = await getUserActivityScore(params)
     if (res.data.code === 0) {
-      rankList.value = res.data.data
+      rankList.value = res.data.data ?? []
     } else {
       message.error('获取排行榜失败，' + res.data.message)
     }

@@ -2,8 +2,6 @@
  * 用户相关类型定义
  */
 
-import type { API } from '@/api/typings'
-
 /**
  * 用户角色枚举
  */

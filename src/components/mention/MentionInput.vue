@@ -42,11 +42,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
-import type { UserVO } from '@/api/typings'
 
 interface Props {
   modelValue: string
-  friends: UserVO[]
+  friends: API.UserVO[]
   placeholder?: string
   maxlength?: number
   autoSize?: { minRows?: number; maxRows?: number }
@@ -104,7 +103,7 @@ const getTextareaElement = (): HTMLTextAreaElement | null => {
 const AI_ASSISTANT_ID = '2020004031158120450'
 
 // 判断是否为 AI 助手
-const isAIAssistant = (user: UserVO): boolean => {
+const isAIAssistant = (user: API.UserVO): boolean => {
   return String(user.id) === AI_ASSISTANT_ID
 }
 const filteredFriends = computed(() => {
@@ -239,7 +238,7 @@ const handleClick = () => {
 }
 
 // Select a friend
-const selectFriend = (friend: UserVO) => {
+const selectFriend = (friend: API.UserVO) => {
   const textarea = getTextareaElement()
   if (!textarea || mentionStartPos.value < 0) return
 
@@ -275,7 +274,7 @@ const focusTextarea = () => {
   textarea?.focus()
 }
 // Extract mentioned users from text
-function getMentionedUsers(): UserVO[] {
+function getMentionedUsers(): API.UserVO[] {
   const mentionPattern = /@([a-zA-Z0-9_\u4e00-\u9fa5]+)/g
   const matches = [...inputValue.value.matchAll(mentionPattern)]
 

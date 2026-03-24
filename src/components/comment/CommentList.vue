@@ -54,7 +54,6 @@
 import { ref, watch, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
 import { addComment, listTopComments, getFriends } from '@/api/commentController'
-import type { API } from '@/api/typings'
 import CommentItem from './CommentItem.vue'
 import MentionInput from '@/components/mention/MentionInput.vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
@@ -120,10 +119,12 @@ const fetchCommentList = async (page: number = 1, append: boolean = false) => {
     }
 
     const res = await listTopComments({
-      pictureId: props.pictureId,
-      current: page,
-      pageSize: pageSize.value,
-      previewSize: 5,
+      request: {
+        pictureId: Number(props.pictureId),
+        current: page,
+        pageSize: pageSize.value,
+        previewSize: 5,
+      },
     })
     if (res.data.code === 0 && res.data.data) {
       const { records, total: totalCount, current: currentPage } = res.data.data

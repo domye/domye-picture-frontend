@@ -146,7 +146,6 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { deletePicture, getPictureVoById } from '@/api/pictureController'
-import type { API } from '@/api/typings'
 import router from '@/router'
 import { SPACE_PERMISSION_ENUM } from '@/constants/space'
 import CommentList from '@/components/comment/CommentList.vue'

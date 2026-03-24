@@ -15,17 +15,11 @@
 
     <!-- 用户图片列表 -->
     <a-card title="Ta 的图片" :bordered="false" style="margin-top: 16px">
-      <PictureList
-        :data-list="pictureList"
-        :loading="loadingPictures"
-      />
+      <PictureList :data-list="pictureList" :loading="loadingPictures" />
       <div v-if="hasMorePictures" class="load-more">
         <a-button :loading="loadingMore" @click="loadMorePictures">加载更多</a-button>
       </div>
-      <a-empty
-        v-if="!loadingPictures && pictureList.length === 0"
-        description="暂无图片"
-      />
+      <a-empty v-if="!loadingPictures && pictureList.length === 0" description="暂无图片" />
     </a-card>
   </div>
 </template>
@@ -36,7 +30,6 @@ import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { getUserProfile } from '@/api/userController'
 import { getUserWorks } from '@/api/pictureController'
-import type { API } from '@/api/typings'
 import PictureList from '@/components/picture/PictureList.vue'
 
 const route = useRoute()

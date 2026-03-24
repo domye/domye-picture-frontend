@@ -2,8 +2,6 @@
  * 图片相关类型定义
  */
 
-import type { API } from '@/api/typings'
-
 /**
  * 图片列表项（扩展自 API.PictureVO）
  */
