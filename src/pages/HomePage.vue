@@ -32,52 +32,55 @@
     </div>
     <!-- 图片瀑布流 -->
     <div class="waterfall-container" ref="waterfallContainer">
-      <TransitionGroup name="waterfall" tag="div" class="waterfall-masonry" :style="masonryStyle">
-        <div
-          v-for="picture in dataList"
-          :key="picture.id"
-          class="waterfall-item"
-          @click="doClickPicture(picture)"
-        >
-          <div class="image-container">
-            <img
-              v-if="picture.url"
-              :alt="picture.name"
-              :src="picture.url"
-              class="waterfall-image"
-              loading="lazy"
-              @error="onImageError($event, picture)"
-            />
-            <div v-else class="image-placeholder">
-              <PictureOutlined />
+      <div class="waterfall-columns" :style="columnsStyle">
+        <div v-for="(column, colIndex) in columns" :key="colIndex" class="waterfall-column">
+          <div
+            v-for="picture in column"
+            :key="picture.id"
+            :ref="(el) => setItemRef(el, picture.id)"
+            class="waterfall-item"
+            @click="doClickPicture(picture)"
+          >
+            <div class="image-container">
+              <img
+                v-if="picture.url"
+                :alt="picture.name"
+                :src="picture.url"
+                class="waterfall-image"
+                loading="lazy"
+                @error="onImageError($event, picture)"
+              />
+              <div v-else class="image-placeholder">
+                <PictureOutlined />
+              </div>
             </div>
-          </div>
-          <div class="image-info">
-            <h3 :title="picture.name">{{ picture.name }}</h3>
-            <p v-if="picture.introduction" class="introduction" :title="picture.introduction">
-              {{ picture.introduction }}
-            </p>
-            <div class="tags" v-if="picture.category || picture.tags?.length">
-              <a-tag v-if="picture.category" color="green" class="tag category-tag">
-                {{ picture.category }}
-              </a-tag>
-              <a-tag v-for="tag in picture.tags" :key="tag" class="tag">
-                {{ tag }}
-              </a-tag>
-            </div>
-            <div class="meta-info" v-if="picture.createTime || picture.user?.userName">
-              <span v-if="picture.user?.userName" class="author">
-                <UserOutlined style="margin-right: 4px" />
-                {{ picture.user.userName }}
-              </span>
-              <span v-if="picture.createTime" class="time">
-                <ClockCircleOutlined style="margin-right: 4px" />
-                {{ formatTime(picture.createTime) }}
-              </span>
+            <div class="image-info">
+              <h3 :title="picture.name">{{ picture.name }}</h3>
+              <p v-if="picture.introduction" class="introduction" :title="picture.introduction">
+                {{ picture.introduction }}
+              </p>
+              <div class="tags" v-if="picture.category || picture.tags?.length">
+                <a-tag v-if="picture.category" color="green" class="tag category-tag">
+                  {{ picture.category }}
+                </a-tag>
+                <a-tag v-for="tag in picture.tags" :key="tag" class="tag">
+                  {{ tag }}
+                </a-tag>
+              </div>
+              <div class="meta-info" v-if="picture.createTime || picture.user?.userName">
+                <span v-if="picture.user?.userName" class="author">
+                  <UserOutlined style="margin-right: 4px" />
+                  {{ picture.user.userName }}
+                </span>
+                <span v-if="picture.createTime" class="time">
+                  <ClockCircleOutlined style="margin-right: 4px" />
+                  {{ formatTime(picture.createTime) }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </TransitionGroup>
+      </div>
     </div>
     <!-- 加载更多 sentinel -->
     <div ref="sentinel" class="load-more-sentinel">
@@ -94,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { listPictureVoByPage } from '@/api/pictureController.ts'
 import { useRouter } from 'vue-router'
 import { useTagCategories, useInfiniteScroll } from '@/composables'
@@ -204,11 +207,125 @@ const columnCount = computed(() => {
   return MAX_COLUMNS              // 超宽屏：7列
 })
 
-// Masonry 样式
-const masonryStyle = computed(() => ({
-  columnCount: columnCount.value,
-  columnGap: `${GAP}px`,
+// 列样式
+const columnsStyle = computed(() => ({
+  gap: `${GAP}px`,
 }))
+
+// 图片宽高比缓存
+const imageAspectRatios = ref<Map<number, number>>(new Map())
+
+// 计算图片宽高比
+const getImageAspectRatio = (picture: API.PictureVO): number => {
+  if (picture.id && imageAspectRatios.value.has(picture.id)) {
+    return imageAspectRatios.value.get(picture.id)!
+  }
+
+  let ratio = 1 // 默认正方形
+
+  if (picture.picWidth && picture.picHeight && picture.picWidth > 0) {
+    ratio = picture.picHeight / picture.picWidth
+  } else if (picture.picScale && picture.picScale > 0) {
+    ratio = 1 / picture.picScale
+  }
+
+  // 限制比例范围，避免极端情况
+  ratio = Math.max(0.5, Math.min(ratio, 2.5))
+
+  if (picture.id) {
+    imageAspectRatios.value.set(picture.id, ratio)
+  }
+
+  return ratio
+}
+
+// 瀑布流列数据
+const columns = ref<API.PictureVO[][]>([])
+
+// ========== FLIP 动画 ==========
+const itemRefs = new Map<number, HTMLElement>()
+
+// 收集 DOM 引用
+const setItemRef = (el: unknown, id: number) => {
+  if (el instanceof HTMLElement) {
+    itemRefs.set(id, el)
+  }
+}
+
+// 记录元素当前位置
+const recordPositions = (): Map<number, DOMRect> => {
+  const positions = new Map<number, DOMRect>()
+  itemRefs.forEach((el, id) => {
+    positions.set(id, el.getBoundingClientRect())
+  })
+  return positions
+}
+
+// 应用 FLIP 动画
+const applyFlipAnimation = (firstPositions: Map<number, DOMRect>) => {
+  // 读取新位置并应用 FLIP
+  itemRefs.forEach((el, id) => {
+    const first = firstPositions.get(id)
+    if (!first) return
+
+    const last = el.getBoundingClientRect()
+
+    // 计算位置差异
+    const deltaX = first.left - last.left
+    const deltaY = first.top - last.top
+
+    // 只有位置变化时才应用动画
+    if (deltaX !== 0 || deltaY !== 0) {
+      // Invert: 将元素移动回原位置
+      el.style.transform = `translate(${deltaX}px, ${deltaY}px)`
+      el.style.transition = 'none'
+
+      // Play: 下一帧开始动画
+      requestAnimationFrame(() => {
+        el.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+        el.style.transform = ''
+      })
+    }
+  })
+}
+
+// 分配图片到各列（最短列优先）
+const distributePictures = async () => {
+  const count = columnCount.value
+  if (count <= 0) return
+
+  // 记录当前位置（FLIP: First）
+  const firstPositions = recordPositions()
+
+  const newColumns: API.PictureVO[][] = Array.from({ length: count }, () => [])
+  const columnHeights: number[] = Array(count).fill(0)
+
+  // 按高度最小的列分配（从左到右阅读顺序）
+  dataList.value.forEach((picture) => {
+    const minHeight = Math.min(...columnHeights)
+    const minIndex = columnHeights.indexOf(minHeight)
+
+    newColumns[minIndex].push(picture)
+    // 使用宽高比计算相对高度
+    const ratio = getImageAspectRatio(picture)
+    columnHeights[minIndex] += ratio
+  })
+
+  columns.value = newColumns
+
+  // 等待 DOM 更新后应用 FLIP 动画
+  await nextTick()
+  applyFlipAnimation(firstPositions)
+}
+
+// 监听数据和列数变化，重新分配
+watch(
+  [dataList, columnCount],
+  () => {
+    distributePictures()
+  },
+  { immediate: true },
+)
 
 // 图片加载错误处理
 const onImageError = (event: Event, picture: API.PictureVO) => {
@@ -269,47 +386,36 @@ const formatTime = (time: string) => {
   min-height: 200px;
 }
 
-/* Masonry 布局 - 使用 CSS column 实现真正瀑布流 */
-.waterfall-masonry {
+/* 列容器 - flex 布局 */
+.waterfall-columns {
+  display: flex;
   width: 100%;
+  gap: 16px;
 }
 
-/* 瀑布流项目 - 丝滑过渡动画 */
+/* 单列 */
+.waterfall-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 瀑布流项目 */
 .waterfall-item {
-  break-inside: avoid;
-  margin-bottom: 16px;
   cursor: pointer;
   border-radius: 12px;
   overflow: hidden;
   background: white;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  transition:
-    transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    box-shadow 0.3s ease;
+  will-change: transform;
+  transition: box-shadow 0.3s ease;
 }
 
 .waterfall-item:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   transform: translateY(-4px);
-}
-
-/* TransitionGroup 动画 */
-.waterfall-move,
-.waterfall-enter-active,
-.waterfall-leave-active {
-  transition:
-    transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    opacity 0.4s ease;
-}
-
-.waterfall-enter-from,
-.waterfall-leave-to {
-  opacity: 0;
-  transform: scale(0.9);
-}
-
-.waterfall-leave-active {
-  position: absolute;
 }
 
 /* 图片容器 */
