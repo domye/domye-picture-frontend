@@ -86,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { listPictureVoByPage } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
@@ -162,14 +162,16 @@ onMounted(() => {
   window.addEventListener('resize', handleResize)
 
   // 使用 ResizeObserver 监听容器实际宽度
-  if (waterfallContainer.value) {
-    resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        screenWidth.value = entry.contentRect.width
-      }
-    })
-    resizeObserver.observe(waterfallContainer.value)
-  }
+  nextTick(() => {
+    if (waterfallContainer.value) {
+      resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          screenWidth.value = entry.contentRect.width
+        }
+      })
+      resizeObserver.observe(waterfallContainer.value)
+    }
+  })
 })
 
 onUnmounted(() => {
@@ -315,6 +317,7 @@ const onShowSizeChange = (current: number, size: number) => {
 
 /* 瀑布流容器 */
 .waterfall-container {
+  width: 100%;
   display: flex;
   gap: 16px;
   margin-bottom: 24px;
