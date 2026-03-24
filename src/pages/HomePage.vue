@@ -32,16 +32,16 @@
     </div>
     <!-- 图片瀑布流 -->
     <div class="waterfall-container" ref="waterfallContainer">
-      <div v-for="(column, colIndex) in columns" :key="colIndex" class="waterfall-column">
+      <TransitionGroup name="waterfall" tag="div" class="waterfall-grid" :style="gridStyle">
         <div
-          v-for="picture in column"
+          v-for="picture in dataList"
           :key="picture.id"
-          class="waterfall-item card-hover"
+          class="waterfall-item"
           @click="doClickPicture(picture)"
         >
           <div class="image-container" :style="getImageContainerStyle(picture)">
             <img
-              v-if="picture.thumbnailUrl || picture.url"
+              v-if="picture.url"
               :alt="picture.name"
               :src="picture.url"
               class="waterfall-image"
@@ -77,7 +77,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </TransitionGroup>
     </div>
     <!-- 加载更多 sentinel -->
     <div ref="sentinel" class="load-more-sentinel">
@@ -171,7 +171,7 @@ const { dataList, loading, loadingMore, hasMore, sentinel, refresh } =
 
 // 搜索（重置到第一页）
 const doSearch = async () => {
-  imageHeights.value.clear()
+  imageAspectRatios.value.clear()
   await refresh()
 }
 
@@ -190,84 +190,71 @@ const { width: windowWidth } = useWindowSize()
 
 // 瀑布流配置
 const GAP = 16
-const MIN_COLUMN_WIDTH = 180
 const MAX_COLUMNS = 7
-const MOBILE_BREAKPOINT = 768 // 移动端断点，小于此宽度强制单列
 
-// 计算列数
+// 计算列数（基于窗口宽度的响应式断点）
 const columnCount = computed(() => {
-  // 窗口宽度小于移动端断点时，强制单列
-  if (windowWidth.value < MOBILE_BREAKPOINT) {
-    return 1
-  }
+  const width = windowWidth.value
 
-  const width = containerWidth.value
-  if (width <= 0) return 1
-
-  let count = Math.floor((width + GAP) / (MIN_COLUMN_WIDTH + GAP))
-  count = Math.max(1, Math.min(MAX_COLUMNS, count))
-  return count
+  // 响应式断点
+  if (width < 768) return 1      // 移动端：单列
+  if (width < 992) return 2      // 平板：2列
+  if (width < 1200) return 3     // 小桌面：3列
+  if (width < 1400) return 4     // 桌面：4列
+  if (width < 1600) return 5     // 大桌面：5列
+  if (width < 1800) return 6     // 超大桌面：6列
+  return MAX_COLUMNS              // 超宽屏：7列
 })
 
-// 图片高度缓存（基于原始尺寸）
-const imageHeights = ref<Map<number, number>>(new Map())
+// 计算实际列宽
+const actualColumnWidth = computed(() => {
+  const count = columnCount.value
+  if (count <= 0) return 200
+  return (containerWidth.value - (count - 1) * GAP) / count
+})
 
-// 预计算图片高度（使用 API 返回的尺寸，基于基准列宽）
-const BASE_COLUMN_WIDTH = 180 // 基准列宽，用于计算固定高度比例
+// Grid 样式
+const gridStyle = computed(() => ({
+  gridTemplateColumns: `repeat(${columnCount.value}, 1fr)`,
+  gap: `${GAP}px`,
+}))
 
-const calculateImageHeight = (picture: API.PictureVO): number => {
-  if (picture.id && imageHeights.value.has(picture.id)) {
-    return imageHeights.value.get(picture.id)!
+// 图片宽高比缓存
+const imageAspectRatios = ref<Map<number, number>>(new Map())
+
+// 计算图片宽高比
+const getImageAspectRatio = (picture: API.PictureVO): number => {
+  if (picture.id && imageAspectRatios.value.has(picture.id)) {
+    return imageAspectRatios.value.get(picture.id)!
   }
 
-  // 默认高度为基准列宽（正方形）
-  let height = BASE_COLUMN_WIDTH
+  let ratio = 1 // 默认正方形
 
   if (picture.picWidth && picture.picHeight && picture.picWidth > 0) {
-    // 使用 API 返回的尺寸计算高度比例
-    height = (picture.picHeight / picture.picWidth) * BASE_COLUMN_WIDTH
+    ratio = picture.picHeight / picture.picWidth
   } else if (picture.picScale && picture.picScale > 0) {
-    // 使用宽高比
-    height = BASE_COLUMN_WIDTH / picture.picScale
+    ratio = 1 / picture.picScale
   }
 
-  // 限制最大最小高度，避免极端比例
-  height = Math.max(100, Math.min(height, BASE_COLUMN_WIDTH * 2.5))
+  // 限制比例范围，避免极端情况
+  ratio = Math.max(0.5, Math.min(ratio, 2.5))
 
   if (picture.id) {
-    imageHeights.value.set(picture.id, height)
+    imageAspectRatios.value.set(picture.id, ratio)
   }
 
-  return height
+  return ratio
 }
 
-// 瀑布流列数据
-const columns = ref<API.PictureVO[][]>([])
-
-// 分配图片到各列
-const distributePictures = () => {
-  const count = columnCount.value
-  if (count <= 0) return
-
-  const newColumns: API.PictureVO[][] = Array.from({ length: count }, () => [])
-  const columnHeights: number[] = Array(count).fill(0)
-
-  // 按高度最小的列分配
-  dataList.value.forEach((picture) => {
-    const minHeight = Math.min(...columnHeights)
-    const minIndex = columnHeights.indexOf(minHeight)
-
-    newColumns[minIndex].push(picture)
-    columnHeights[minIndex] += calculateImageHeight(picture) + GAP
-  })
-
-  columns.value = newColumns
+// 计算图片实际显示高度（基于当前列宽）
+const calculateDisplayHeight = (picture: API.PictureVO): number => {
+  const ratio = getImageAspectRatio(picture)
+  return actualColumnWidth.value * ratio
 }
 
 // 图片容器样式
 const getImageContainerStyle = (picture: API.PictureVO) => {
-  const height = calculateImageHeight(picture)
-  // 使用 aspect-ratio 或固定高度
+  const height = calculateDisplayHeight(picture)
   return {
     height: `${height}px`,
   }
@@ -277,7 +264,6 @@ const getImageContainerStyle = (picture: API.PictureVO) => {
 const onImageError = (event: Event, picture: API.PictureVO) => {
   const img = event.target as HTMLImageElement
   if (img && picture.url && img.src !== picture.url) {
-    // 尝试加载原图
     img.src = picture.url
   }
 }
@@ -286,15 +272,6 @@ const onImageError = (event: Event, picture: API.PictureVO) => {
 const formatTime = (time: string) => {
   return dayjs(time).fromNow()
 }
-
-// 监听数据变化，重新分配
-watch(
-  [dataList, columnCount],
-  () => {
-    distributePictures()
-  },
-  { immediate: true },
-)
 </script>
 
 <style scoped>
@@ -339,46 +316,64 @@ watch(
 /* 瀑布流容器 */
 .waterfall-container {
   width: 100%;
-  display: flex;
-  gap: 16px;
   min-height: 200px;
 }
 
-/* 瀑布流列 - 添加过渡动画 */
-.waterfall-column {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  transition: all 0.3s ease;
+/* Grid 布局 */
+.waterfall-grid {
+  display: grid;
+  width: 100%;
 }
 
-/* 瀑布流项目 - 添加过渡动画 */
+/* 瀑布流项目 - 丝滑过渡动画 */
 .waterfall-item {
   cursor: pointer;
   border-radius: 12px;
   overflow: hidden;
   background: white;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  break-inside: avoid;
+  transition:
+    transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.3s ease,
+    width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
 }
 
 .waterfall-item:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  transform: translateY(-4px);
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* TransitionGroup 动画 */
+.waterfall-move,
+.waterfall-enter-active,
+.waterfall-leave-active {
+  transition:
+    transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    opacity 0.4s ease;
+}
+
+.waterfall-enter-from,
+.waterfall-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.waterfall-leave-active {
+  position: absolute;
 }
 
 /* 图片容器 */
 .image-container {
   width: 100%;
   overflow: hidden;
-  background: #f5f5f5;
+  background: linear-gradient(135deg, #f5f5f5 0%, #ebebeb 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  transition: height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* 瀑布流图片 */
@@ -507,14 +502,6 @@ watch(
 
 /* 响应式布局 */
 @media (max-width: 768px) {
-  .waterfall-container {
-    gap: 12px;
-  }
-
-  .waterfall-column {
-    gap: 12px;
-  }
-
   .waterfall-item {
     border-radius: 8px;
   }
