@@ -25,3 +25,6 @@ export type { UseRequestOptions, UseRequestReturn } from './useRequest'
 
 export { useTagCategories, clearTagCategoriesCache } from './useTagCategories'
 export type { UseTagCategoriesReturn } from './useTagCategories'
+
+export { useInfiniteScroll } from './useInfiniteScroll'
+export type { UseInfiniteScrollOptions, UseInfiniteScrollReturn } from './useInfiniteScroll'

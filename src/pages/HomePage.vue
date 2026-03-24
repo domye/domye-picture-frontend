@@ -66,17 +66,10 @@
         </div>
       </div>
     </div>
-    <!-- 分页 -->
-    <div class="pagination-container fade-in">
-      <a-pagination
-        v-model:current="searchParams.current"
-        v-model:pageSize="searchParams.pageSize"
-        :total="total"
-        @change="onPageChange"
-        @showSizeChange="onShowSizeChange"
-        show-size-changer
-        :page-size-options="['10', '20', '50', '100']"
-      />
+    <!-- 加载更多 sentinel -->
+    <div ref="sentinel" class="load-more-sentinel">
+      <a-spin v-if="loadingMore" size="large" />
+      <span v-else-if="!hasMore && dataList.length > 0" class="no-more-text"> 已经到底啦 ~ </span>
     </div>
     <!-- 加载状态 -->
     <div v-if="loading" class="loading-container">
@@ -88,25 +81,14 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { listPictureVoByPage } from '@/api/pictureController.ts'
-import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
-import { useTagCategories } from '@/composables'
+import { useTagCategories, useInfiniteScroll } from '@/composables'
 
 // 使用标签分类 composable
 const { tagList, categoryList } = useTagCategories()
 
-// 定义数据
-const dataList = ref<API.PictureVO[]>([])
-const total = ref(0)
-const loading = ref(true)
-const screenWidth = ref(window.innerWidth)
-const waterfallContainer = ref<HTMLElement | null>(null)
-let resizeObserver: ResizeObserver | null = null
-
 // 搜索条件
 const searchParams = reactive<API.PictureQueryRequest>({
-  current: 1,
-  pageSize: 20,
   sortField: 'createTime',
   sortOrder: 'descend',
 })
@@ -114,6 +96,44 @@ const searchParams = reactive<API.PictureQueryRequest>({
 // 标签选择状态
 const selectedCategory = ref<string>('all')
 const selectedTagList = ref<boolean[]>([])
+
+// 构建搜索参数
+const buildSearchParams = () => {
+  const params: API.PictureQueryRequest = {
+    ...searchParams,
+    tags: [] as string[],
+  }
+  if (selectedCategory.value !== 'all') {
+    params.category = selectedCategory.value
+  }
+  selectedTagList.value.forEach((useTag, index) => {
+    if (useTag) {
+      params.tags!.push(tagList.value[index])
+    }
+  })
+  return params
+}
+
+// 使用无限滚动 composable
+const { dataList, loading, loadingMore, hasMore, sentinel, refresh } =
+  useInfiniteScroll<API.PictureVO>({
+    defaultPageSize: 10,
+    fetchFn: async (page, pageSize) => {
+      const params = buildSearchParams()
+      params.current = page
+      params.pageSize = pageSize
+      const res = await listPictureVoByPage(params)
+      if (res.data.code === 0 && res.data.data) {
+        return {
+          records: res.data.data.records ?? [],
+          total: res.data.data.total ?? 0,
+          current: page,
+        }
+      }
+      throw new Error(res.data.message || '获取数据失败')
+    },
+    immediate: true,
+  })
 
 // 监听 tagList 变化，初始化 selectedTagList
 watch(
@@ -124,41 +144,17 @@ watch(
   { immediate: true },
 )
 
-// 获取数据
-const fetchData = async () => {
-  loading.value = true
-  // 转换搜索参数
-  const params = {
-    ...searchParams,
-    tags: [] as string[],
-  }
-  if (selectedCategory.value !== 'all') {
-    params.category = selectedCategory.value
-  }
-  // [true, false, false] => ['java']
-  selectedTagList.value.forEach((useTag, index) => {
-    if (useTag) {
-      params.tags.push(tagList.value[index])
-    }
-  })
-  const res = await listPictureVoByPage(params)
-  if (res.data.code === 0 && res.data.data) {
-    dataList.value = res.data.data.records ?? []
-    total.value = res.data.data.total ?? 0
-  } else {
-    message.error('获取数据失败，' + res.data.message)
-  }
-  loading.value = false
-}
+const screenWidth = ref(window.innerWidth)
+const waterfallContainer = ref<HTMLElement | null>(null)
+let resizeObserver: ResizeObserver | null = null
 
 // 监听窗口大小变化
 const handleResize = () => {
   screenWidth.value = window.innerWidth
 }
 
-// 页面加载时获取数据
+// 页面加载时设置事件监听
 onMounted(() => {
-  fetchData()
   window.addEventListener('resize', handleResize)
 
   // 使用 ResizeObserver 监听容器实际宽度
@@ -179,11 +175,9 @@ onUnmounted(() => {
   resizeObserver?.disconnect()
 })
 
-// 搜索
-const doSearch = () => {
-  // 重置搜索条件
-  searchParams.current = 1
-  fetchData()
+// 搜索（重置到第一页）
+const doSearch = async () => {
+  await refresh()
 }
 
 const router = useRouter()
@@ -261,19 +255,6 @@ watch(
   },
   { immediate: true },
 )
-
-// 分页变化处理
-const onPageChange = (page: number) => {
-  searchParams.current = page
-  fetchData()
-}
-
-// 每页条数变化处理
-const onShowSizeChange = (current: number, size: number) => {
-  searchParams.current = current
-  searchParams.pageSize = size
-  fetchData()
-}
 </script>
 
 <style scoped>
@@ -395,15 +376,19 @@ const onShowSizeChange = (current: number, size: number) => {
   transform: scale(1.05);
 }
 
-/* 分页容器 */
-.pagination-container {
+/* 加载更多 sentinel */
+.load-more-sentinel {
   display: flex;
   justify-content: center;
+  align-items: center;
+  min-height: 80px;
   margin: 24px 0;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 8px;
-  backdrop-filter: blur(10px);
+}
+
+.no-more-text {
+  color: #999;
+  font-size: 14px;
 }
 
 /* 加载状态 */
